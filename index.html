@@ -51,7 +51,7 @@
       font-size: 17px;
       line-height: 1.7;
       overflow-x: hidden;
-      cursor: crosshair;
+      cursor: none;
     }
 
     /* ── NOISE OVERLAY ── */
@@ -75,7 +75,7 @@
       z-index: 9998;
     }
 
-    /* ── CURSOR TRAIL ── */
+    /* ── CURSOR ── */
     .cursor-dot {
       position: fixed;
       width: 8px;
@@ -99,6 +99,33 @@
       z-index: 9999;
       transform: translate(-50%, -50%);
       transition: width 0.2s, height 0.2s, border-color 0.2s;
+    }
+
+    body.cursor-hover .cursor-dot {
+      transform: translate(-50%, -50%) scale(1.6);
+      box-shadow: 0 0 18px var(--cyan), 0 0 40px rgba(0, 229, 255, 0.6);
+    }
+
+    body.cursor-hover .cursor-ring {
+      width: 52px;
+      height: 52px;
+      border-color: rgba(0, 229, 255, 0.9);
+      box-shadow:
+        inset 0 0 10px rgba(0, 229, 255, 0.35),
+        inset 0 0 25px rgba(0, 229, 255, 0.2),
+        0 0 20px rgba(0, 229, 255, 0.25);
+    }
+
+    /* ── DEVTOOLS MODE: FORCE SYSTEM CURSOR ── */
+    body.devtools-open,
+    body.devtools-open * {
+      cursor: default !important;
+    }
+
+    body.devtools-open input,
+    body.devtools-open textarea,
+    body.devtools-open [contenteditable="true"] {
+      cursor: default !important;
     }
 
     /* ── GRID BACKGROUND ── */
@@ -136,6 +163,7 @@
       color: var(--cyan);
       letter-spacing: 0.15em;
       text-decoration: none;
+      cursor: none;
     }
 
     .nav-logo span {
@@ -156,6 +184,7 @@
       letter-spacing: 0.1em;
       transition: color 0.3s;
       position: relative;
+      cursor: none;
     }
 
     .nav-links a::before {
@@ -289,7 +318,7 @@
       background: var(--cyan);
       color: #000;
       border: none;
-      cursor: pointer;
+      cursor: none;
       text-decoration: none;
       clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
       transition: all 0.3s;
@@ -309,7 +338,7 @@
       background: transparent;
       color: var(--cyan);
       border: 1px solid var(--border-bright);
-      cursor: pointer;
+      cursor: none;
       text-decoration: none;
       transition: all 0.3s;
       clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
@@ -555,7 +584,7 @@
       padding: 1.2rem 1rem;
       text-align: center;
       background: var(--bg2);
-      cursor: default;
+      cursor: none;
       position: relative;
       overflow: hidden;
       transition: all 0.3s;
@@ -644,7 +673,7 @@
       padding: 2rem;
       position: relative;
       overflow: hidden;
-      cursor: pointer;
+      cursor: none;
       transition: all 0.4s;
       clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
     }
@@ -1034,6 +1063,7 @@
       text-decoration: none;
       transition: all 0.3s;
       clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+      cursor: none;
     }
 
     .contact-link:hover {
@@ -1741,9 +1771,18 @@
       requestAnimationFrame(animRing);
     }
     animRing();
-    document.querySelectorAll('a, button, .tech-item, .project-card, .passion-card').forEach(el => {
-      el.addEventListener('mouseenter', () => { ring.style.width = '60px'; ring.style.height = '60px'; ring.style.borderColor = 'rgba(0,229,255,0.8)'; });
-      el.addEventListener('mouseleave', () => { ring.style.width = '36px'; ring.style.height = '36px'; ring.style.borderColor = 'rgba(0,229,255,0.5)'; });
+    const hoverTargets = document.querySelectorAll(
+      'a, button, .tech-item, .project-card, .passion-card, input, textarea, select, [role="button"]'
+    );
+
+    hoverTargets.forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        document.body.classList.add('cursor-hover');
+      });
+
+      el.addEventListener('mouseleave', () => {
+        document.body.classList.remove('cursor-hover');
+      });
     });
 
     /* ── PROGRESS BAR ── */
@@ -1917,6 +1956,19 @@
         ['dashIP', 'dashISP', 'dashCountry', 'dashTZ'].forEach(id => document.getElementById(id).classList.remove('loading'));
       }
     }
+
+    function detectDevTools() {
+      const threshold = 160;
+
+      const widthDiff = window.outerWidth - window.innerWidth;
+      const heightDiff = window.outerHeight - window.innerHeight;
+
+      const isOpen = widthDiff > threshold || heightDiff > threshold;
+
+      document.body.classList.toggle('devtools-open', isOpen);
+    }
+
+    setInterval(detectDevTools, 500);
     loadGeoData();
   </script>
 </body>
