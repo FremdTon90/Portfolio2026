@@ -1,0 +1,1924 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dustin Kenneth Groß — Web Developer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600;700&family=Orbitron:wght@400;700;900&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --cyan: #00e5ff;
+      --cyan-dim: #00b8cc;
+      --cyan-glow: rgba(0, 229, 255, 0.15);
+      --cyan-deep: rgba(0, 229, 255, 0.05);
+      --bg: #03070f;
+      --bg2: #060d1a;
+      --bg3: #0a1628;
+      --text: #c8d8f0;
+      --text-dim: #5a7a9a;
+      --text-muted: #7ea3c7;
+      --red: #ff2244;
+      --amber: #ffaa00;
+      --green: #00ff88;
+      --border: rgba(0, 229, 255, 0.12);
+      --border-bright: rgba(0, 229, 255, 0.35);
+      --font-mono: 'Share Tech Mono', monospace;
+      --font-display: 'Orbitron', monospace;
+      --font-body: 'Rajdhani', sans-serif;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 17px;
+      line-height: 1.7;
+      overflow-x: hidden;
+      cursor: crosshair;
+    }
+
+    /* ── NOISE OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.6;
+    }
+
+    /* ── SCANLINES ── */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 0, 0, 0.03) 2px, rgba(0, 0, 0, 0.03) 4px);
+      pointer-events: none;
+      z-index: 9998;
+    }
+
+    /* ── CURSOR TRAIL ── */
+    .cursor-dot {
+      position: fixed;
+      width: 8px;
+      height: 8px;
+      background: var(--cyan);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 10000;
+      transform: translate(-50%, -50%);
+      transition: opacity 0.3s;
+      box-shadow: 0 0 12px var(--cyan), 0 0 24px rgba(0, 229, 255, 0.4);
+    }
+
+    .cursor-ring {
+      position: fixed;
+      width: 36px;
+      height: 36px;
+      border: 1px solid rgba(0, 229, 255, 0.5);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: width 0.2s, height 0.2s, border-color 0.2s;
+    }
+
+    /* ── GRID BACKGROUND ── */
+    .grid-bg {
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0, 229, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 229, 255, 0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.2rem 3rem;
+      background: rgba(3, 7, 15, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      font-family: var(--font-display);
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--cyan);
+      letter-spacing: 0.15em;
+      text-decoration: none;
+    }
+
+    .nav-logo span {
+      color: var(--text-dim);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2.5rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      text-decoration: none;
+      letter-spacing: 0.1em;
+      transition: color 0.3s;
+      position: relative;
+    }
+
+    .nav-links a::before {
+      content: '//';
+      color: var(--cyan);
+      opacity: 0;
+      margin-right: 4px;
+      transition: opacity 0.3s;
+    }
+
+    .nav-links a:hover {
+      color: var(--cyan);
+    }
+
+    .nav-links a:hover::before {
+      opacity: 1;
+    }
+
+    .nav-status {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--green);
+      border-radius: 50%;
+      animation: pulse-green 2s infinite;
+    }
+
+    @keyframes pulse-green {
+
+      0%,
+      100% {
+        box-shadow: 0 0 0 0 rgba(0, 255, 136, 0.4);
+      }
+
+      50% {
+        box-shadow: 0 0 0 6px rgba(0, 255, 136, 0);
+      }
+    }
+
+    /* ── HERO ── */
+    #hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 0 3rem;
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    .hero-canvas {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      max-width: 900px;
+    }
+
+    .hero-tag {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--cyan);
+      letter-spacing: 0.2em;
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: fadein-up 0.8s 0.3s forwards;
+    }
+
+    .hero-name {
+      font-family: var(--font-display);
+      font-size: clamp(2.5rem, 6vw, 5.5rem);
+      font-weight: 900;
+      line-height: 1.05;
+      color: #fff;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      opacity: 0;
+      animation: fadein-up 0.8s 0.5s forwards;
+    }
+
+    .hero-name .accent {
+      color: var(--cyan);
+    }
+
+    .hero-subtitle {
+      font-family: var(--font-display);
+      font-size: clamp(0.9rem, 2vw, 1.3rem);
+      color: var(--text-dim);
+      letter-spacing: 0.25em;
+      margin-top: 0.5rem;
+      opacity: 0;
+      animation: fadein-up 0.8s 0.7s forwards;
+    }
+
+    .hero-desc {
+      max-width: 560px;
+      color: var(--text-dim);
+      font-size: 1.05rem;
+      margin-top: 1.8rem;
+      opacity: 0;
+      animation: fadein-up 0.8s 0.9s forwards;
+    }
+
+    .hero-cta {
+      display: flex;
+      gap: 1.2rem;
+      margin-top: 2.5rem;
+      flex-wrap: wrap;
+      opacity: 0;
+      animation: fadein-up 0.8s 1.1s forwards;
+    }
+
+    .btn-primary {
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      letter-spacing: 0.15em;
+      padding: 0.85rem 2rem;
+      background: var(--cyan);
+      color: #000;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+      transition: all 0.3s;
+      font-weight: 700;
+    }
+
+    .btn-primary:hover {
+      background: #fff;
+      box-shadow: 0 0 30px rgba(0, 229, 255, 0.5);
+    }
+
+    .btn-secondary {
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      letter-spacing: 0.15em;
+      padding: 0.85rem 2rem;
+      background: transparent;
+      color: var(--cyan);
+      border: 1px solid var(--border-bright);
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.3s;
+      clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+    }
+
+    .btn-secondary:hover {
+      background: var(--cyan-deep);
+      border-color: var(--cyan);
+      box-shadow: 0 0 20px rgba(0, 229, 255, 0.2);
+    }
+
+    .hero-scroll {
+      position: absolute;
+      bottom: 2.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      opacity: 0;
+      animation: fadein 1s 1.8s forwards;
+    }
+
+    .hero-scroll span {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.25em;
+      color: var(--text-muted);
+    }
+
+    .scroll-line {
+      width: 1px;
+      height: 60px;
+      background: linear-gradient(to bottom, var(--cyan), transparent);
+      animation: scroll-pulse 2s infinite;
+    }
+
+    @keyframes scroll-pulse {
+      0% {
+        opacity: 1;
+        transform: scaleY(1);
+        transform-origin: top;
+      }
+
+      100% {
+        opacity: 0;
+        transform: scaleY(0.2);
+        transform-origin: top;
+      }
+    }
+
+    /* ── SECTION LAYOUT ── */
+    section {
+      position: relative;
+      z-index: 1;
+      padding: 7rem 3rem;
+    }
+
+    .section-header {
+      margin-bottom: 4rem;
+    }
+
+    .section-tag {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--cyan);
+      letter-spacing: 0.25em;
+      margin-bottom: 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .section-tag::after {
+      content: '';
+      flex: 1;
+      max-width: 80px;
+      height: 1px;
+      background: var(--border-bright);
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-weight: 700;
+      color: #fff;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .section-title .accent {
+      color: var(--cyan);
+    }
+
+    /* ── REVEAL ANIMATIONS ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .reveal-left {
+      opacity: 0;
+      transform: translateX(-40px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+
+    .reveal-left.visible {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .reveal-right {
+      opacity: 0;
+      transform: translateX(40px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+
+    .reveal-right.visible {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    /* ── ABOUT / IDENTITY ── */
+    #about {
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5rem;
+      align-items: start;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .about-text p {
+      color: var(--text-dim);
+      margin-bottom: 1.2rem;
+      font-size: 1.05rem;
+    }
+
+    .about-text strong {
+      color: var(--cyan);
+      font-weight: 600;
+    }
+
+    .identity-cards {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .id-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      padding: 1.2rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.3s, background 0.3s;
+      clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%);
+    }
+
+    .id-card:hover {
+      border-color: var(--border-bright);
+      background: var(--bg3);
+    }
+
+    .id-card::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: var(--cyan);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .id-card:hover::before {
+      opacity: 1;
+    }
+
+    .id-icon {
+      font-size: 1.5rem;
+      width: 40px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .id-label {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 0.15rem;
+    }
+
+    .id-value {
+      font-weight: 600;
+      color: var(--text);
+      font-size: 1rem;
+    }
+
+    /* ── TECH STACK ── */
+    #stack {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding-top: 7rem;
+      padding-bottom: 7rem;
+    }
+
+    #stack>* {
+      max-width: 1200px;
+    }
+
+    .stack-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .tech-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 1rem;
+    }
+
+    .tech-item {
+      border: 1px solid var(--border);
+      padding: 1.2rem 1rem;
+      text-align: center;
+      background: var(--bg2);
+      cursor: default;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s;
+      clip-path: polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px));
+    }
+
+    .tech-item:hover {
+      border-color: var(--cyan);
+      background: var(--bg3);
+      transform: translateY(-4px);
+      box-shadow: 0 0 24px var(--cyan-glow);
+    }
+
+    .tech-item::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(0, 229, 255, 0.05) 0%, transparent 60%);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .tech-item:hover::before {
+      opacity: 1;
+    }
+
+    .tech-icon {
+      font-size: 1.8rem;
+      margin-bottom: 0.4rem;
+      display: block;
+    }
+
+    .tech-name {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--cyan);
+      letter-spacing: 0.1em;
+      display: block;
+    }
+
+    .tech-level {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      margin-top: 0.2rem;
+      font-family: var(--font-mono);
+      display: block;
+    }
+
+    .tech-bar {
+      height: 2px;
+      background: var(--border);
+      margin-top: 0.6rem;
+      border-radius: 1px;
+      overflow: hidden;
+    }
+
+    .tech-bar-fill {
+      height: 100%;
+      background: var(--cyan);
+      transition: width 1.5s ease;
+      width: 0;
+    }
+
+    .tech-item.visible .tech-bar-fill {
+      width: var(--pct);
+    }
+
+    /* ── PROJECTS ── */
+    #projects {
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 1.5rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .project-card {
+      border: 1px solid var(--border);
+      background: var(--bg);
+      padding: 2rem;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.4s;
+      clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
+    }
+
+    .project-card:hover {
+      border-color: var(--border-bright);
+      transform: translateY(-6px);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 40px var(--cyan-glow);
+    }
+
+    .project-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(0, 229, 255, 0.04) 0%, transparent 50%);
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+
+    .project-card:hover::after {
+      opacity: 1;
+    }
+
+    .project-num {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      letter-spacing: 0.2em;
+      margin-bottom: 1rem;
+    }
+
+    .project-title {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.8rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .project-desc {
+      color: var(--text-dim);
+      font-size: 0.95rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .project-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .tag {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      padding: 0.25rem 0.6rem;
+      border: 1px solid var(--border-bright);
+      color: var(--cyan);
+      letter-spacing: 0.1em;
+    }
+
+    .project-status {
+      position: absolute;
+      top: 1.2rem;
+      right: 1.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.15em;
+      padding: 0.2rem 0.6rem;
+      border: 1px solid;
+    }
+
+    .status-soon {
+      color: var(--amber);
+      border-color: rgba(255, 170, 0, 0.3);
+      background: rgba(255, 170, 0, 0.05);
+    }
+
+    .status-live {
+      color: var(--green);
+      border-color: rgba(0, 255, 136, 0.3);
+      background: rgba(0, 255, 136, 0.05);
+    }
+
+    /* ── LIVE DASHBOARD ── */
+    #dashboard {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 7rem 3rem;
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .dash-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      padding: 1.5rem;
+      clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .dash-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+      opacity: 0.6;
+    }
+
+    .dash-label {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 0.6rem;
+    }
+
+    .dash-value {
+      font-family: var(--font-mono);
+      font-size: 1.1rem;
+      color: var(--cyan);
+      word-break: break-all;
+      line-height: 1.4;
+    }
+
+    .dash-value.loading {
+      animation: blink 1s infinite;
+    }
+
+    @keyframes blink {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.3;
+      }
+    }
+
+    .geo-map {
+      grid-column: 1 / -1;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      padding: 2rem;
+      position: relative;
+      min-height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .geo-display {
+      text-align: center;
+    }
+
+    .geo-city {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 0.1em;
+    }
+
+    .geo-coords {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--cyan);
+      margin-top: 0.3rem;
+    }
+
+    .pulse-ring {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      background: var(--cyan);
+      border-radius: 50%;
+      margin-right: 8px;
+      animation: pulse-cyan 2s infinite;
+      vertical-align: middle;
+    }
+
+    @keyframes pulse-cyan {
+
+      0%,
+      100% {
+        box-shadow: 0 0 0 0 rgba(0, 229, 255, 0.6);
+      }
+
+      50% {
+        box-shadow: 0 0 0 10px rgba(0, 229, 255, 0);
+      }
+    }
+
+    .disclaimer {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      margin-top: 2rem;
+      text-align: center;
+      letter-spacing: 0.1em;
+    }
+
+    /* ── PASSIONS / MULTI-DISCIPLINE ── */
+    #passions {
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .passions-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .passion-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      padding: 2rem;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.4s;
+      clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+    }
+
+    .passion-card:hover {
+      border-color: var(--border-bright);
+      box-shadow: 0 0 30px var(--cyan-glow);
+    }
+
+    .passion-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, var(--cyan-deep) 0%, transparent 60%);
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+
+    .passion-card:hover::before {
+      opacity: 1;
+    }
+
+    .passion-icon {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      display: block;
+    }
+
+    .passion-title {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--cyan);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin-bottom: 0.6rem;
+    }
+
+    .passion-desc {
+      color: var(--text-dim);
+      font-size: 0.95rem;
+    }
+
+    /* ── TIMELINE / STORY ── */
+    #story {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .timeline {
+      position: relative;
+      padding-left: 2rem;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      background: linear-gradient(to bottom, var(--cyan), transparent);
+    }
+
+    .timeline-item {
+      position: relative;
+      margin-bottom: 3rem;
+      padding-left: 2rem;
+    }
+
+    .timeline-dot {
+      position: absolute;
+      left: -2.3rem;
+      top: 0.3rem;
+      width: 10px;
+      height: 10px;
+      border: 2px solid var(--cyan);
+      background: var(--bg);
+      border-radius: 50%;
+      box-shadow: 0 0 12px var(--cyan);
+    }
+
+    .timeline-year {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--cyan);
+      letter-spacing: 0.2em;
+      margin-bottom: 0.3rem;
+    }
+
+    .timeline-title {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fff;
+      text-transform: uppercase;
+      margin-bottom: 0.4rem;
+    }
+
+    .timeline-desc {
+      color: var(--text-dim);
+      font-size: 0.95rem;
+    }
+
+    /* ── CONTACT ── */
+    #contact {
+      text-align: center;
+      padding: 8rem 3rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #contact::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(ellipse, rgba(0, 229, 255, 0.04) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .contact-sub {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      max-width: 500px;
+      margin: 1.5rem auto 3rem;
+      line-height: 1.8;
+      letter-spacing: 0.05em;
+    }
+
+    .contact-links {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .contact-link {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      letter-spacing: 0.15em;
+      padding: 0.8rem 1.8rem;
+      border: 1px solid var(--border-bright);
+      color: var(--text);
+      text-decoration: none;
+      transition: all 0.3s;
+      clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+    }
+
+    .contact-link:hover {
+      color: var(--cyan);
+      border-color: var(--cyan);
+      background: var(--cyan-deep);
+      box-shadow: 0 0 20px var(--cyan-glow);
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem 3rem;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      position: relative;
+      z-index: 1;
+    }
+
+    footer span:first-child {
+      justify-self: start;
+    }
+
+    footer span:nth-child(2) {
+      justify-self: center;
+      text-align: center;
+    }
+
+    footer span:last-child {
+      justify-self: end;
+    }
+
+    /* ── GLITCH EFFECT ── */
+    .glitch {
+      position: relative;
+    }
+
+    .glitch::before,
+    .glitch::after {
+      content: attr(data-text);
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .glitch::before {
+      color: rgba(0, 229, 255, 0.7);
+      clip-path: polygon(0 20%, 100% 20%, 100% 40%, 0 40%);
+      animation: glitch-1 4s infinite;
+    }
+
+    .glitch::after {
+      color: rgba(255, 34, 68, 0.7);
+      clip-path: polygon(0 60%, 100% 60%, 100% 80%, 0 80%);
+      animation: glitch-2 4s infinite;
+    }
+
+    @keyframes glitch-1 {
+
+      0%,
+      90%,
+      100% {
+        transform: translate(0);
+      }
+
+      91% {
+        transform: translate(-4px, 0);
+      }
+
+      93% {
+        transform: translate(4px, 0);
+      }
+
+      95% {
+        transform: translate(-2px, 0);
+      }
+    }
+
+    @keyframes glitch-2 {
+
+      0%,
+      85%,
+      100% {
+        transform: translate(0);
+      }
+
+      86% {
+        transform: translate(4px, 0);
+      }
+
+      88% {
+        transform: translate(-4px, 0);
+      }
+
+      90% {
+        transform: translate(2px, 0);
+      }
+    }
+
+    /* ── TYPING ── */
+    .typewriter {
+      overflow: hidden;
+      white-space: nowrap;
+      border-right: 2px solid var(--cyan);
+      animation: typing 2s steps(30) 1.5s forwards, blink-cursor 0.75s step-end infinite 1.5s;
+      width: 0;
+    }
+
+    @keyframes typing {
+      to {
+        width: 100%;
+      }
+    }
+
+    @keyframes blink-cursor {
+
+      0%,
+      100% {
+        border-color: var(--cyan);
+      }
+
+      50% {
+        border-color: transparent;
+      }
+    }
+
+    /* ── UTIL ── */
+    @keyframes fadein-up {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadein {
+      to {
+        opacity: 1;
+      }
+    }
+
+    .section-wrapper {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .mt-2 {
+      margin-top: 2rem;
+    }
+
+    /* ── DIVIDER ANIMATION ── */
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg,
+          transparent,
+          rgba(0, 229, 255, 0.15),
+          var(--border-bright),
+          rgba(0, 229, 255, 0.15),
+          transparent);
+      margin: 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .divider::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -25%;
+      width: 25%;
+      height: 100%;
+      background: linear-gradient(90deg,
+          transparent 0%,
+          rgba(0, 229, 255, 0.2) 20%,
+          rgba(0, 229, 255, 1) 50%,
+          rgba(0, 229, 255, 0.2) 80%,
+          transparent 100%);
+      filter: blur(0.6px);
+
+      animation: kitt-move 3s linear infinite alternate,
+        kitt-glow 3s ease-in-out infinite alternate;
+    }
+
+    @keyframes kitt-move {
+      0% {
+        left: -25%;
+      }
+
+      100% {
+        left: 100%;
+      }
+    }
+
+    @keyframes kitt-glow {
+      0% {
+        opacity: 0.25;
+      }
+
+      50% {
+        opacity: 1;
+        filter: blur(1px) drop-shadow(0 0 10px rgba(0, 229, 255, 0.9));
+      }
+
+      100% {
+        opacity: 0.25;
+      }
+    }
+
+    /* ── PROGRESS BAR ── */
+    .progress-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 2px;
+      background: var(--cyan);
+      box-shadow: 0 0 8px var(--cyan);
+      z-index: 10001;
+      transition: width 0.1s;
+    }
+
+    /* ── MEDIA ── */
+    @media (max-width: 768px) {
+      nav {
+        padding: 1rem 1.5rem;
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      section {
+        padding: 5rem 1.5rem;
+      }
+
+      #hero {
+        padding: 0 1.5rem;
+      }
+
+      .about-grid {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+      }
+
+      footer {
+        flex-direction: column;
+        gap: 0.5rem;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="cursor-dot" id="cursorDot"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+  <div class="progress-bar" id="progressBar"></div>
+  <div class="grid-bg"></div>
+
+  <!-- NAV -->
+  <nav>
+    <a class="nav-logo" href="#hero">DKG<span>.dev</span></a>
+
+    <ul class="nav-links">
+      <li><a href="#about">ABOUT</a></li>
+      <li><a href="#stack">STACK</a></li>
+      <li><a href="#projects">PROJEKTE</a></li>
+      <li><a href="#passions">UNIVERSEN</a></li>
+      <li><a href="#dashboard">TERMINAL</a></li>
+      <li><a href="#story">TIMELINE</a></li>
+      <li><a href="#contact">KONTAKT</a></li>
+    </ul>
+
+    <div class="nav-status">
+      <div class="status-dot"></div>
+      VERFÜGBAR FÜR PROJEKTE
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section id="hero">
+    <canvas class="hero-canvas" id="heroCanvas"></canvas>
+    <div class="hero-content">
+      <div class="hero-tag">// INITIATING SEQUENCE . HAMBURG . DE</div>
+      <h1 class="hero-name glitch" data-text="DUSTIN KENNETH GROß">
+        DUSTIN<br><span class="accent">KENNETH</span><br>GROß
+      </h1>
+      <div class="hero-subtitle">FRONTEND DEVELOPER · KREATIVKOPF · MULTIDISZIPLINÄR</div>
+      <p class="hero-desc">
+        Ich entwickle Webseiten, die mehr sind als reine Oberflächen —<br>
+        mit sauberem Code und dem Anspruch, dass sie sich gut anfühlen.
+      </p>
+      <div class="hero-cta">
+        <a class="btn-primary" href="#projects">PROJEKTE ANSEHEN</a>
+        <a class="btn-secondary" href="#contact">KONTAKT AUFNEHMEN</a>
+      </div>
+    </div>
+    <div class="hero-scroll">
+      <span>SCROLL</span>
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="about-grid">
+      <div class="about-text reveal-left">
+        <div class="section-header">
+          <div class="section-tag">// 001 · WER BIN ICH</div>
+          <h2 class="section-title">MEHR ALS<br><span class="accent">NUR CODE</span></h2>
+        </div>
+        <p>Ich bin Dustin — ausgebildeter <strong>Fachinformatiker für Anwendungsentwicklung</strong> aus Hamburg.
+          Softwareentwicklung ist für mich kein Werkzeug, sondern der Kern meiner Arbeit: Ich denke in Systemen und
+          entwickle digitale Lösungen mit Anspruch.</p>
+        <p>Mein Fundament reicht von <strong>Softwareentwicklung, Mechatronik, CAD-Design und Robotik</strong> bis hin
+          zu kreativen und technischen Disziplinen. Diese Kombination hat mir beigebracht, komplexe Probleme
+          strukturiert zu verstehen und präzise zu lösen.</p>
+        <p>Seit <strong>20 Jahren</strong> bewege ich mich zwischen Technologien, visueller Gestaltung und
+          genereller Kreativität. Ich verbinde
+          technisches und kreatives Denken mit präziser Umsetzung und entwickle daraus eigene Projekte, die
+          beides vereinen.</p>
+        <p>Ich entwickle Anwendungen ganzheitlich — von Backend-Logik bis zur Oberfläche. Besonders
+          <strong>UI/UX-Design</strong> interessiert mich, da hier die direkte Schnittstelle zwischen Mensch und System
+          entsteht. Ich arbeite mit Technologien wie <strong>Django</strong>, <strong>HTML</strong>,
+          <strong>CSS</strong> und <strong>JavaScript</strong> und erweitere meinen <strong>Tech-Stack</strong>
+          kontinuierlich um neue Tools und Frameworks.
+        </p>
+      </div>
+      <div class="identity-cards reveal-right">
+        <div class="id-card">
+          <div class="id-icon">📍</div>
+          <div>
+            <div class="id-label">STANDORT</div>
+            <div class="id-value">Hamburg, Deutschland</div>
+          </div>
+        </div>
+        <div class="id-card">
+          <div class="id-icon">🎓</div>
+          <div>
+            <div class="id-label">AUSBILDUNG</div>
+            <div class="id-value">Fahrzeugbauer · Einzelhändler ·</div>
+            <div class="id-value">Fachinformatiker Anwendungsentwicklung</div>
+          </div>
+        </div>
+        <div class="id-card">
+          <div class="id-icon">🎵</div>
+          <div>
+            <div class="id-label">HOBBY / PASSION</div>
+            <div class="id-value">Musikproduktion · Visualisierungen · Bouldern</div>
+          </div>
+        </div>
+        <div class="id-card">
+          <div class="id-icon">🤖</div>
+          <div>
+            <div class="id-label">BACKGROUND</div>
+            <div class="id-value">Mechatronik · CAD · Robotik · Sensorik</div>
+          </div>
+        </div>
+        <div class="id-card">
+          <div class="id-icon">✏️</div>
+          <div>
+            <div class="id-label">KREATIV</div>
+            <div class="id-value">Illustration · Grafikdesign · Motion</div>
+          </div>
+        </div>
+        <div class="id-card">
+          <div class="id-icon">🧠</div>
+          <div>
+            <div class="id-label">PROBLEMLÖSUNG</div>
+            <div class="id-value">Analytisches Outside-the-Box-Denken</div>
+          </div>
+        </div>
+        <div class="id-card">
+          <div class="id-icon">🎯</div>
+          <div>
+            <div class="id-label">ZIEL</div>
+            <div class="id-value">Frontend / Django Web Development</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- STACK -->
+  <section id="stack">
+    <div class="stack-container">
+      <div class="section-header reveal">
+        <div class="section-tag">// 002 · WERKZEUG</div>
+        <h2 class="section-title">MEIN <span class="accent">TECH STACK</span></h2>
+      </div>
+      <div class="tech-grid" id="techGrid">
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- PROJECTS -->
+  <section id="projects">
+    <div class="section-wrapper">
+      <div class="section-header reveal">
+        <div class="section-tag">// 003 · ARBEIT</div>
+        <h2 class="section-title">AUSGEWÄHLTE<br><span class="accent">PROJEKTE</span></h2>
+      </div>
+      <div class="projects-grid">
+        <div class="project-card reveal">
+          <div class="project-status status-soon">COMING SOON</div>
+          <div class="project-num">PROJECT_01</div>
+          <div class="project-title">Portfolio v2.0</div>
+          <div class="project-desc">Diese Seite hier — als vollständige Next-Generation Web Experience mit Three.js,
+            WebGL-Shader und interaktiven 3D-Elementen.</div>
+          <div class="project-tags">
+            <span class="tag">HTML</span><span class="tag">CSS</span><span class="tag">JavaScript</span><span
+              class="tag">Three.js</span>
+          </div>
+        </div>
+        <div class="project-card reveal">
+          <div class="project-status status-soon">IN PLANUNG</div>
+          <div class="project-num">PROJECT_02</div>
+          <div class="project-title">SoundVis Engine</div>
+          <div class="project-desc">Web Audio API trifft auf WebGL — eine soundreaktive Visualisierungsengine direkt im
+            Browser. 20 Jahre Erfahrung, jetzt im Web.</div>
+          <div class="project-tags">
+            <span class="tag">Web Audio API</span><span class="tag">WebGL</span><span class="tag">Canvas</span>
+          </div>
+        </div>
+        <div class="project-card reveal">
+          <div class="project-status status-soon">IN PLANUNG</div>
+          <div class="project-num">PROJECT_03</div>
+          <div class="project-title">Django Dashboard</div>
+          <div class="project-desc">Vollständiges Backend-Frontend-Projekt mit Django REST Framework, live
+            Datenbankanbindung und reaktivem Frontend.</div>
+          <div class="project-tags">
+            <span class="tag">Django</span><span class="tag">Python</span><span class="tag">REST API</span><span
+              class="tag">JS</span>
+          </div>
+        </div>
+        <div class="project-card reveal">
+          <div class="project-status status-soon">CONCEPT</div>
+          <div class="project-num">PROJECT_04</div>
+          <div class="project-title">Robotik Interface</div>
+          <div class="project-desc">Ein Web-Interface zur Steuerung und Visualisierung von Sensordaten — mein
+            Mechatronik-Background trifft auf Web.</div>
+          <div class="project-tags">
+            <span class="tag">Sensorik</span><span class="tag">WebSocket</span><span class="tag">Django</span><span
+              class="tag">Charts</span>
+          </div>
+        </div>
+        <div class="project-card reveal">
+          <div class="project-status status-soon">CONCEPT</div>
+          <div class="project-num">PROJECT_05</div>
+          <div class="project-title">CAD to Web</div>
+          <div class="project-desc">3D-Modelle aus CAD direkt im Browser erlebbar machen — Three.js Viewer für
+            technische Zeichnungen und Bauteile.</div>
+          <div class="project-tags">
+            <span class="tag">Three.js</span><span class="tag">CAD</span><span class="tag">3D</span><span
+              class="tag">WebGL</span>
+          </div>
+        </div>
+        <div class="project-card reveal">
+          <div class="project-status status-soon">CONCEPT</div>
+          <div class="project-num">PROJECT_06</div>
+          <div class="project-title">Generative Art Gallery</div>
+          <div class="project-desc">Algorithmic Art auf Basis meiner Illustrationen — generativ, interaktiv,
+            soundreaktiv. Mein Universum als Web-Erlebnis.</div>
+          <div class="project-tags">
+            <span class="tag">P5.js</span><span class="tag">Canvas</span><span class="tag">Generative</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- PASSIONS -->
+  <section id="passions">
+    <div class="section-wrapper">
+      <div class="section-header reveal">
+        <div class="section-tag">// 004 · UNIVERSEN</div>
+        <h2 class="section-title">ICH BIN <span class="accent">MEHR</span><br>ALS EIN ENTWICKLER</h2>
+      </div>
+      <div class="passions-grid">
+        <div class="passion-card reveal">
+          <span class="passion-icon">🎛️</span>
+          <div class="passion-title">Musik & Sound</div>
+          <p class="passion-desc">20 Jahre Musikproduktion. Ich höre Musik nicht nur –
+            ich erschaffe sie komplett selbst, bringe sie auf Festivalbühnen
+            und verwandle sie in soundreaktive Visuals, die jeden Beat sichtbar machen.</p>
+        </div>
+        <div class="passion-card reveal">
+          <span class="passion-icon">🤖</span>
+          <div class="passion-title">Robotik & Sensorik</div>
+          <p class="passion-desc">Ich liebe es, wenn Software auf die physische Welt trifft. Sensordaten, Aktoren,
+            Regelkreise — Mechatronik ist meine zweite Muttersprache.</p>
+        </div>
+        <div class="passion-card reveal">
+          <span class="passion-icon">📐</span>
+          <div class="passion-title">CAD & Design</div>
+          <p class="passion-desc">Präzision ist Standard. CAD hat mir beigebracht,
+            dass Design Funktion ist — ein Grundsatz, der sich durch alles zieht, was ich mache.</p>
+        </div>
+        <div class="passion-card reveal">
+          <span class="passion-icon">✏️</span>
+          <div class="passion-title">Illustration & Grafik</div>
+          <p class="passion-desc">Ich zeichne und baue Grafiken aus Überzeugung,
+            nicht aus Notwendigkeit — weil kreatives Denken der entscheidende Faktor
+            zwischen gutem und außergewöhnlichem Design ist.</p>
+        </div>
+        <div class="passion-card reveal">
+          <span class="passion-icon">🌐</span>
+          <div class="passion-title">Web als Medium</div>
+          <p class="passion-desc">Das Web ist das stärkste kreative Medium unserer Zeit:
+            interaktiv, lebendig und weltweit zugänglich. Es bietet Potenziale,
+            die bisher nur selten genutzt oder überhaupt erkannt wurden.</p>
+        </div>
+        <div class="passion-card reveal">
+          <span class="passion-icon">⚡</span>
+          <div class="passion-title">Continuous Learning</div>
+          <p class="passion-desc">Was ich nicht kann, bringe ich mir selbst bei —
+            bis ich es sicher beherrsche und überall dort einsetzen kann, wo ich es brauche.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- TERMINAL / DASHBOARD -->
+  <section id="dashboard">
+    <div class="section-wrapper">
+      <div class="section-header reveal">
+        <div class="section-tag">// 005 · LIVE TERMINAL</div>
+        <h2 class="section-title">SIE WERDEN<br><span class="accent">GESEHEN</span></h2>
+      </div>
+      <div class="reveal">
+        <div class="geo-map">
+          <div class="geo-display">
+            <div
+              style="font-family:var(--font-mono);font-size:0.7rem;color:var(--text-muted);letter-spacing:0.2em;margin-bottom:0.8rem;">
+              AKTUELLER STANDORT ERKANNT</div>
+            <div class="geo-city"><span class="pulse-ring"></span><span id="geoCity">WIRD GELADEN...</span></div>
+            <div class="geo-coords" id="geoRegion">// INITIALISIERUNG</div>
+          </div>
+        </div>
+        <div class="dashboard-grid mt-2">
+          <div class="dash-card">
+            <div class="dash-label">IP ADRESSE</div>
+            <div class="dash-value loading" id="dashIP">____.____.____.____</div>
+          </div>
+          <div class="dash-card">
+            <div class="dash-label">ISP / PROVIDER</div>
+            <div class="dash-value loading" id="dashISP">SCANNING...</div>
+          </div>
+          <div class="dash-card">
+            <div class="dash-label">LAND</div>
+            <div class="dash-value loading" id="dashCountry">SCANNING...</div>
+          </div>
+          <div class="dash-card">
+            <div class="dash-label">ZEITZONE</div>
+            <div class="dash-value loading" id="dashTZ">SCANNING...</div>
+          </div>
+          <div class="dash-card">
+            <div class="dash-label">BROWSER</div>
+            <div class="dash-value" id="dashBrowser">SCANNING...</div>
+          </div>
+          <div class="dash-card">
+            <div class="dash-label">BILDSCHIRM</div>
+            <div class="dash-value" id="dashScreen">SCANNING...</div>
+          </div>
+          <div class="dash-card">
+            <div class="dash-label">BETRIEBSSYSTEM</div>
+            <div class="dash-value" id="dashOS">SCANNING...</div>
+          </div>
+          <div class="dash-card">
+            <div class="dash-label">LOKALE UHRZEIT</div>
+            <div class="dash-value" id="dashTime">--:--:--</div>
+          </div>
+        </div>
+        <p class="disclaimer">// Nur zur
+          Demonstration der technischen Möglichkeiten · Diese Daten sind öffentlich zugänglich und werden nicht
+          gespeichert</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- STORY / TIMELINE -->
+  <section id="story" style="padding: 7rem 3rem;">
+    <div class="section-header reveal" style="text-align:center;max-width:700px;margin:0 auto 4rem;">
+      <div class="section-tag" style="justify-content:center;">// 006 · ENTWICKLUNG</div>
+      <h2 class="section-title">DER WEG<br><span class="accent">ZUM SYSTEMDENKER</span></h2>
+    </div>
+
+    <div class="timeline">
+
+      <div class="timeline-item reveal">
+        <div class="timeline-dot"></div>
+        <div class="timeline-year">KLANG · BILD · SYSTEME</div>
+        <div class="timeline-title">Musik & visuelle Experimente</div>
+        <p class="timeline-desc">
+          Kreativität als Ausgangspunkt: Musikproduktion, Sounddesign und visuelle Systeme. Erste Erfahrungen mit
+          reaktiven, dynamischen Strukturen.
+        </p>
+      </div>
+
+      <div class="timeline-item reveal">
+        <div class="timeline-dot"></div>
+        <div class="timeline-year">TECHNISCHE GRUNDLAGE</div>
+        <div class="timeline-title">Mechatronik & CAD</div>
+        <p class="timeline-desc">
+          Verständnis für physische Systeme, Präzision und logische Strukturen. Wie einzelne Komponenten zusammen ein
+          funktionierendes Ganzes bilden.
+        </p>
+      </div>
+
+      <div class="timeline-item reveal">
+        <div class="timeline-dot"></div>
+        <div class="timeline-year">SYSTEMVERNETZUNG</div>
+        <div class="timeline-title">Robotik</div>
+        <p class="timeline-desc">
+          Verbindung von Mechanik, Elektronik und Logik. Erste echte Schnittstelle zwischen physischer Welt und
+          programmierter Steuerung.
+        </p>
+      </div>
+
+      <div class="timeline-item reveal">
+        <div class="timeline-dot"></div>
+        <div class="timeline-year">STRUKTURIERTE ENTWICKLUNG</div>
+        <div class="timeline-title">Softwareentwicklung</div>
+        <p class="timeline-desc">
+          Einstieg in Architektur, Datenstrukturen und systematisches Programmieren. Übergang von funktionalem Denken zu
+          abstrakten Systemen.
+        </p>
+      </div>
+
+      <div class="timeline-item reveal">
+        <div class="timeline-dot"></div>
+        <div class="timeline-year">UMSETZUNG</div>
+        <div class="timeline-title">Eigene Projekte</div>
+        <p class="timeline-desc">
+          Entwicklung eigener Anwendungen und Systeme. Verbindung aus Logik, Design und interaktiven Interfaces.
+        </p>
+      </div>
+
+      <div class="timeline-item reveal">
+        <div class="timeline-dot" style="border-color:var(--cyan);box-shadow:0 0 12px var(--cyan);"></div>
+        <div class="timeline-year" style="color:var(--cyan);">EVOLUTION</div>
+        <div class="timeline-title">Web Development</div>
+        <p class="timeline-desc">
+          Fokus auf moderne Webtechnologien, UI/UX und interaktive Systeme. Aufbau von Anwendungen, die dynamisch
+          reagieren statt nur zu funktionieren.
+        </p>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <div class="reveal">
+      <div class="section-tag" style="justify-content:center;">// 007 · VERBINDUNG</div>
+      <h2 class="section-title" style="font-size:clamp(2.5rem,5vw,4rem);text-align:center;">LASS UNS<br><span
+          class="accent">BAUEN</span></h2>
+      <p class="contact-sub">Ich verbinde technisches Verständnis mit einem kreativen Blick für Lösungen,
+        die über Lehrbuchdenken hinausgehen. Wenn du jemanden suchst, der nicht nur umsetzt, sondern mitdenkt, sollten
+        wir sprechen.</p>
+      <div class="contact-links">
+        <a class="contact-link" href="mailto:dein@email.de">📧 EMAIL</a>
+        <a class="contact-link" href="https://github.com/FremdTon90" target="_blank">⬡ GITHUB</a>
+        <a class="contact-link" href="https://linkedin.com/" target="_blank">🔗 LINKEDIN</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <span>© 2026 DUSTIN KENNETH GROß · HAMBURG</span>
+    <span style="font-family:var(--font-mono)">BUILT WITH: ♥ + HTML · CSS · JS</span>
+    <span>DKG.DEV</span>
+  </footer>
+
+  <script>
+    /* ── CURSOR ── */
+    const dot = document.getElementById('cursorDot');
+    const ring = document.getElementById('cursorRing');
+    let mx = 0, my = 0, rx = 0, ry = 0;
+    document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; dot.style.left = mx + 'px'; dot.style.top = my + 'px'; });
+    function lerp(a, b, t) { return a + (b - a) * t; }
+    function animRing() {
+      rx = lerp(rx, mx, 0.12); ry = lerp(ry, my, 0.12);
+      ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+      requestAnimationFrame(animRing);
+    }
+    animRing();
+    document.querySelectorAll('a, button, .tech-item, .project-card, .passion-card').forEach(el => {
+      el.addEventListener('mouseenter', () => { ring.style.width = '60px'; ring.style.height = '60px'; ring.style.borderColor = 'rgba(0,229,255,0.8)'; });
+      el.addEventListener('mouseleave', () => { ring.style.width = '36px'; ring.style.height = '36px'; ring.style.borderColor = 'rgba(0,229,255,0.5)'; });
+    });
+
+    /* ── PROGRESS BAR ── */
+    const pb = document.getElementById('progressBar');
+    window.addEventListener('scroll', () => {
+      const pct = window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100;
+      pb.style.width = pct + '%';
+    });
+
+    /* ── HERO PARTICLE CANVAS ── */
+    const canvas = document.getElementById('heroCanvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    class Particle {
+      constructor() { this.reset(); }
+      reset() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.vx = (Math.random() - 0.5) * 0.4;
+        this.vy = (Math.random() - 0.5) * 0.4;
+        this.size = Math.random() * 1.5 + 0.3;
+        this.alpha = Math.random() * 0.5 + 0.1;
+        this.life = Math.random() * 200 + 100;
+        this.age = 0;
+      }
+      update() {
+        this.x += this.vx; this.y += this.vy;
+        this.age++;
+        if (this.age > this.life) this.reset();
+      }
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(0,229,255,${this.alpha * (1 - this.age / this.life)})`;
+        ctx.fill();
+      }
+    }
+
+    for (let i = 0; i < 120; i++) particles.push(new Particle());
+
+    let mouseX = canvas.width / 2, mouseY = canvas.height / 2;
+    canvas.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; });
+
+    function drawConnections() {
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 100) {
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.strokeStyle = `rgba(0,229,255,${0.06 * (1 - dist / 100)})`;
+            ctx.lineWidth = 0.5;
+            ctx.stroke();
+          }
+        }
+      }
+    }
+
+    function animParticles() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => { p.update(); p.draw(); });
+      drawConnections();
+      requestAnimationFrame(animParticles);
+    }
+    animParticles();
+
+    /* ── TECH STACK ── */
+    const techs = [
+      { icon: '🌐', name: 'HTML5', level: 'FORTGESCHRITTEN', pct: 85 },
+      { icon: '🎨', name: 'CSS3', level: 'FORTGESCHRITTEN', pct: 82 },
+      { icon: '⚡', name: 'JavaScript', level: 'LERNEND', pct: 65 },
+      { icon: '🐍', name: 'Python', level: 'MITTEL', pct: 89 },
+      { icon: '🦄', name: 'Django', level: 'LERNEND', pct: 80 },
+      { icon: '🗄️', name: 'SQL', level: 'MITTEL', pct: 62 },
+      { icon: '📦', name: 'Git', level: 'MITTEL', pct: 72 },
+      { icon: '🐋', name: 'Docker', level: 'ANFÄNGER', pct: 40 },
+      { icon: '⚛️', name: 'React', level: 'LERNEND', pct: 45 },
+      { icon: '🎭', name: 'Three.js', level: 'LERNEND', pct: 38 },
+      { icon: '📐', name: 'CAD', level: 'ERFAHREN', pct: 86 },
+      { icon: '🎛️', name: 'Ableton', level: 'EXPERTE', pct: 92 },
+    ];
+
+    const grid = document.getElementById('techGrid');
+    techs.forEach(t => {
+      const el = document.createElement('div');
+      el.className = 'tech-item reveal';
+      el.style.setProperty('--pct', t.pct + '%');
+      el.innerHTML = `<span class="tech-icon">${t.icon}</span><span class="tech-name">${t.name}</span><span class="tech-level">${t.level}</span><div class="tech-bar"><div class="tech-bar-fill"></div></div>`;
+      grid.appendChild(el);
+    });
+
+    /* ── SCROLL REVEAL ── */
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((e, i) => {
+        if (e.isIntersecting) {
+          setTimeout(() => {
+            e.target.classList.add('visible');
+            if (e.target.classList.contains('tech-item')) {
+              const fill = e.target.querySelector('.tech-bar-fill');
+              if (fill) fill.style.width = e.target.style.getPropertyValue('--pct');
+            }
+          }, i * 60);
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .tech-item').forEach(el => observer.observe(el));
+
+    /* ── LIVE DASHBOARD ── */
+    function detectBrowser() {
+      const ua = navigator.userAgent;
+      if (ua.includes('Edg')) return 'Microsoft Edge';
+      if (ua.includes('Chrome') && ua.includes('Safari')) return 'Google Chrome';
+      if (ua.includes('Firefox')) return 'Mozilla Firefox';
+      if (ua.includes('Safari') && !ua.includes('Chrome')) return 'Apple Safari';
+      return 'Unbekannt';
+    }
+    function detectOS() {
+      const ua = navigator.userAgent;
+      if (ua.includes('Win')) return 'Windows';
+      if (ua.includes('Mac')) return 'macOS';
+      if (ua.includes('Linux')) return 'Linux';
+      if (ua.includes('Android')) return 'Android';
+      if (ua.includes('iPhone') || ua.includes('iPad')) return 'iOS';
+      return 'Unbekannt';
+    }
+
+    document.getElementById('dashBrowser').textContent = detectBrowser();
+    document.getElementById('dashBrowser').classList.remove('loading');
+    document.getElementById('dashScreen').textContent = `${screen.width} × ${screen.height} PX`;
+    document.getElementById('dashOS').textContent = detectOS();
+
+    function updateTime() {
+      const now = new Date();
+      document.getElementById('dashTime').textContent = now.toLocaleTimeString('de-DE');
+    }
+    updateTime();
+    setInterval(updateTime, 1000);
+
+    async function loadGeoData() {
+      try {
+        const res = await fetch('https://ipapi.co/json/');
+        const d = await res.json();
+
+        document.getElementById('geoCity').textContent = (d.city || 'UNBEKANNT').toUpperCase();
+        document.getElementById('geoRegion').textContent = `// ${d.region || ''}, ${d.country_name || ''}`;
+        document.getElementById('dashIP').textContent = d.ip || 'N/A';
+        document.getElementById('dashIP').classList.remove('loading');
+        document.getElementById('dashISP').textContent = d.org || 'N/A';
+        document.getElementById('dashISP').classList.remove('loading');
+        document.getElementById('dashCountry').textContent = `${d.country_name || 'N/A'} ${d.country_code ? '(' + d.country_code + ')' : ''}`;
+        document.getElementById('dashCountry').classList.remove('loading');
+        document.getElementById('dashTZ').textContent = d.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone;
+        document.getElementById('dashTZ').classList.remove('loading');
+      } catch (e) {
+        const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        document.getElementById('geoCity').textContent = 'API NICHT ERREICHBAR';
+        document.getElementById('geoRegion').textContent = `// LOKAL ERKANNT: ${tz}`;
+        document.getElementById('dashIP').textContent = 'GEBLOCKT';
+        document.getElementById('dashISP').textContent = 'NICHT VERFÜGBAR';
+        document.getElementById('dashCountry').textContent = navigator.language.toUpperCase();
+        document.getElementById('dashTZ').textContent = tz;
+        ['dashIP', 'dashISP', 'dashCountry', 'dashTZ'].forEach(id => document.getElementById(id).classList.remove('loading'));
+      }
+    }
+    loadGeoData();
+  </script>
+</body>
+
+</html>
