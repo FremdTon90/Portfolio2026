@@ -1427,8 +1427,6 @@
   <!-- HERO -->
   <section id="hero">
 
-    <canvas class="hero-canvas" id="nebulaCanvas"></canvas>
-
     <canvas class="hero-canvas" id="heroCanvas"></canvas>
 
     <div class="hero-content">
@@ -1965,7 +1963,7 @@
         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
 
         ctx.fillStyle = `rgba(0,229,255,${alpha})`;
-        ctx.shadowColor = 'rgba(0,229,255,0.6)';
+        ctx.shadowColor = 'rgba(0,229,255,0.3)';
         ctx.shadowBlur = this.z * 6;
 
         ctx.fill();
@@ -1997,99 +1995,6 @@
       requestAnimationFrame(animate);
     }
     animate();
-
-
-    /* ── NEBULA ── */
-    const nebulaCanvas = document.getElementById('nebulaCanvas');
-    const nctx = nebulaCanvas.getContext('2d');
-
-    function resizeNebula() {
-      nebulaCanvas.width = window.innerWidth;
-      nebulaCanvas.height = window.innerHeight;
-    }
-    resizeNebula();
-    window.addEventListener('resize', resizeNebula);
-
-    const clouds = [];
-
-    for (let i = 0; i < 20; i++) {
-      clouds.push({
-        x: 0,
-        y: 0,
-        r: Math.random() * 120 + 60,
-        vx: (Math.random() - 0.5) * 0.05,
-        vy: (Math.random() - 0.5) * 0.05,
-        hue: 0,
-
-        baseX: Math.random() * 2 - 1,
-        baseY: Math.random() * 2 - 1
-      });
-    }
-
-    function drawNebula() {
-      nctx.clearRect(0, 0, nebulaCanvas.width, nebulaCanvas.height);
-
-      nctx.globalCompositeOperation = "source-over";
-      nctx.globalAlpha = 0.25;
-
-      const centerX = nebulaCanvas.width * 0.5;
-      const centerY = nebulaCanvas.height * 0.5;
-
-      const maxW = nebulaCanvas.width * 0.5;
-      const maxH = nebulaCanvas.height * 0.35;
-
-      const radius = 220;
-
-      clouds.forEach(c => {
-
-        const targetX = centerX + (c.baseX || 0) * maxW * 0.5;
-        const targetY = centerY + (c.baseY || 0) * maxH * 0.5;
-
-        c.x += (targetX - c.x) * 0.015;
-        c.y += (targetY - c.y) * 0.015;
-
-        const t = Date.now() * 0.00008;
-
-        const noiseX = Math.sin(c.y * 0.004 + t) * 0.3;
-        const noiseY = Math.cos(c.x * 0.004 - t) * 0.3;
-
-        c.x += noiseX;
-        c.y += noiseY;
-
-        const dx = mouseX - c.x;
-        const dy = mouseY - c.y;
-
-        const dist = Math.sqrt(dx * dx + dy * dy);
-
-        if (dist < radius) {
-          const strength = 1 - dist / radius;
-          const force = strength * strength * 0.01;
-
-          c.x += dx * force;
-          c.y += dy * force;
-        }
-
-        const size = 120 + c.r * 2.5;
-
-        const grad = nctx.createRadialGradient(
-          c.x, c.y, 0,
-          c.x, c.y, size
-        );
-
-        grad.addColorStop(0, "rgba(120,200,255,0.06)");
-        grad.addColorStop(0.5, "rgba(80,140,255,0.03)");
-        grad.addColorStop(1, "rgba(0,0,0,0)");
-
-        nctx.fillStyle = grad;
-
-        nctx.beginPath();
-        nctx.arc(c.x, c.y, size, 0, Math.PI * 2);
-        nctx.fill();
-      });
-
-      requestAnimationFrame(drawNebula);
-    }
-    drawNebula();
 
     /* ── TECH STACK ── */
     const techs = [
