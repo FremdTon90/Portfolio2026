@@ -59,10 +59,11 @@
       content: '';
       position: fixed;
       inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.02'/%3E%3C/svg%3E");
       pointer-events: none;
       z-index: 9999;
-      opacity: 0.6;
+      opacity: 0.25;
+      will-change: transform;
     }
 
     /* ── SCANLINES ── */
@@ -70,9 +71,15 @@
       content: '';
       position: fixed;
       inset: 0;
-      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 0, 0, 0.03) 2px, rgba(0, 0, 0, 0.03) 4px);
+      background: repeating-linear-gradient(0deg,
+          transparent,
+          transparent 3px,
+          rgba(0, 0, 0, 0.02) 3px,
+          rgba(0, 0, 0, 0.02) 4px);
       pointer-events: none;
       z-index: 9998;
+      opacity: 0.5;
+      will-change: transform;
     }
 
     /* ── CURSOR ── */
@@ -127,17 +134,7 @@
       cursor: default !important;
     }
 
-    /* ── GRID BACKGROUND ── */
-    .grid-bg {
-      position: fixed;
-      inset: 0;
-      background-image:
-        linear-gradient(rgba(0, 229, 255, 0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0, 229, 255, 0.03) 1px, transparent 1px);
-      background-size: 60px 60px;
-      pointer-events: none;
-      z-index: 0;
-    }
+
 
     /* ── NAV ── */
     nav {
@@ -383,9 +380,36 @@
       animation: scroll-pulse 2s infinite;
     }
 
-    /* ── SECTION LAYOUT ── */
+    .section-wrapper,
+    .about-grid,
+    .stack-container,
+    .projects-grid,
+    .passions-grid,
+    .timeline,
+    .dashboard-grid,
+    .geo-map,
+    .section-header {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ── SECTION CANVASES ── */
+    .section-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
     section {
       position: relative;
+      overflow: hidden;
+    }
+
+    /* ── SECTION LAYOUT ── */
+    section {
       z-index: 1;
       padding: 7rem 3rem;
     }
@@ -462,7 +486,6 @@
 
     /* ── ABOUT / IDENTITY ── */
     #about {
-      background: var(--bg2);
       border-top: 1px solid var(--border);
       border-bottom: 1px solid var(--border);
     }
@@ -480,6 +503,15 @@
       color: var(--text-dim);
       margin-bottom: 1.2rem;
       font-size: 1.05rem;
+    }
+
+    .about-text {
+      background: rgba(3, 7, 15, 0.55);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      border: 1px solid rgba(0, 229, 255, 0.06);
+      padding: 2rem 2.2rem;
+      border-radius: 2px;
     }
 
     .about-text strong {
@@ -550,14 +582,8 @@
 
     /* ── TECH STACK ── */
     #stack {
-      max-width: 1200px;
-      margin: 0 auto;
       padding-top: 7rem;
       padding-bottom: 7rem;
-    }
-
-    #stack>* {
-      max-width: 1200px;
     }
 
     .stack-container {
@@ -646,7 +672,6 @@
 
     /* ── PROJECTS ── */
     #projects {
-      background: var(--bg2);
       border-top: 1px solid var(--border);
       border-bottom: 1px solid var(--border);
     }
@@ -753,8 +778,6 @@
 
     /* ── LIVE DASHBOARD ── */
     #dashboard {
-      max-width: 1200px;
-      margin: 0 auto;
       padding: 7rem 3rem;
     }
 
@@ -883,7 +906,6 @@
 
     /* ── PASSIONS / MULTI-DISCIPLINE ── */
     #passions {
-      background: var(--bg2);
       border-top: 1px solid var(--border);
       border-bottom: 1px solid var(--border);
     }
@@ -946,11 +968,6 @@
     }
 
     /* ── TIMELINE / STORY ── */
-    #story {
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
     .timeline {
       position: relative;
       padding-left: 2rem;
@@ -1402,7 +1419,7 @@
   <div class="cursor-dot" id="cursorDot"></div>
   <div class="cursor-ring" id="cursorRing"></div>
   <div class="progress-bar" id="progressBar"></div>
-  <div class="grid-bg"></div>
+
 
   <!-- NAV -->
   <nav>
@@ -1462,6 +1479,7 @@
 
   <!-- ABOUT -->
   <section id="about">
+    <canvas class="section-canvas" id="aboutCanvas"></canvas>
     <div class="about-grid">
       <div class="about-text reveal-left">
         <div class="section-header">
@@ -1544,6 +1562,7 @@
 
   <!-- STACK -->
   <section id="stack">
+    <canvas class="section-canvas" id="stackCanvas"></canvas>
     <div class="stack-container">
       <div class="section-header reveal">
         <div class="section-tag">// 002 · WERKZEUG</div>
@@ -1558,6 +1577,7 @@
 
   <!-- PROJECTS -->
   <section id="projects">
+    <canvas class="section-canvas" id="projectsCanvas"></canvas>
     <div class="section-wrapper">
       <div class="section-header reveal">
         <div class="section-tag">// 003 · ARBEIT</div>
@@ -1636,6 +1656,7 @@
 
   <!-- Universen -->
   <section id="passions">
+    <canvas class="section-canvas" id="passionsCanvas"></canvas>
     <div class="section-wrapper">
       <div class="section-header reveal">
         <div class="section-tag">// 004 · UNIVERSEN</div>
@@ -1689,6 +1710,7 @@
 
   <!-- TERMINAL / DASHBOARD -->
   <section id="dashboard">
+    <canvas class="section-canvas" id="dashboardCanvas"></canvas>
     <div class="section-wrapper">
       <div class="section-header reveal">
         <div class="section-tag">// 005 · LIVE TERMINAL</div>
@@ -1749,6 +1771,7 @@
 
   <!-- STORY / TIMELINE -->
   <section id="story" style="padding: 7rem 3rem;">
+    <canvas class="section-canvas" id="storyCanvas"></canvas>
     <div class="section-header reveal" style="text-align:center;max-width:700px;margin:0 auto 4rem;">
       <div class="section-tag" style="justify-content:center;">// 006 · ENTWICKLUNG</div>
       <h2 class="section-title">DER WEG<br><span class="accent">ZUM SYSTEMDENKER</span></h2>
@@ -1822,6 +1845,7 @@
 
   <!-- CONTACT -->
   <section id="contact">
+    <canvas class="section-canvas" id="contactCanvas"></canvas>
     <div class="reveal">
       <div class="section-tag" style="justify-content:center;">// 007 · VERBINDUNG</div>
       <h2 class="section-title" style="font-size:clamp(2.5rem,5vw,4rem);text-align:center;">LASS UNS<br><span
@@ -1865,6 +1889,38 @@
   </footer>
 
   <script>
+    const CanvasEngine = {
+      scenes: [],
+
+      register(scene) {
+        this.scenes.push(scene);
+      },
+
+      start() {
+        const loop = () => {
+          for (const s of this.scenes) {
+            if (!s.canvas || !s.ctx) continue;
+            if (document.hidden) continue;
+
+            const rect = s.canvas.getBoundingClientRect();
+            const inView =
+              rect.bottom > 0 &&
+              rect.right > 0 &&
+              rect.top < window.innerHeight &&
+              rect.left < window.innerWidth;
+
+            if (!inView) continue;
+            if (rect.width === 0 || rect.height === 0) continue;
+
+            s.draw();
+          }
+
+          requestAnimationFrame(loop);
+        };
+
+        loop();
+      }
+    };
     /* ── CURSOR ── */
     const dot = document.getElementById('cursorDot');
     const ring = document.getElementById('cursorRing');
@@ -1972,6 +2028,32 @@
 
     const particles = [];
     for (let i = 0; i < 450; i++) particles.push(new Particle());
+    (function () {
+      const canvas = document.getElementById('heroCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+
+      function fit() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+      fit();
+      window.addEventListener('resize', fit);
+
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        ctx.fillStyle = 'rgba(0,0,0,0.15)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        particles.forEach(p => {
+          p.update(mouseX, mouseY);
+          p.draw();
+        });
+      }
+
+      CanvasEngine.register({ canvas, ctx, draw });
+    })();
 
     let mouseX = window.innerWidth / 2;
     let mouseY = window.innerHeight / 2;
@@ -1980,21 +2062,6 @@
       mouseX = e.clientX;
       mouseY = e.clientY;
     });
-
-    function animate() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      ctx.fillStyle = 'rgba(0,0,0,0.15)';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      particles.forEach(p => {
-        p.update(mouseX, mouseY);
-        p.draw();
-      });
-
-      requestAnimationFrame(animate);
-    }
-    animate();
 
     /* ── TECH STACK ── */
     const techs = [
@@ -2111,6 +2178,771 @@
     setInterval(detectDevTools, 500);
     loadGeoData();
   </script>
+  <script>
+    /* ══════════════════════════════════════════════
+       SECTION BACKGROUNDS — MOUSE REACTIVE
+    ══════════════════════════════════════════════ */
+
+    // Shared mouse position (global, already tracked by cursor code)
+    let gMx = window.innerWidth / 2, gMy = window.innerHeight / 2;
+    document.addEventListener('mousemove', e => { gMx = e.clientX; gMy = e.clientY; });
+
+    /* helper: resize canvas to match its section */
+    function fitCanvas(canvas) {
+      const section = canvas.parentElement;
+      canvas.width = section.offsetWidth;
+      canvas.height = section.offsetHeight;
+    }
+
+    /* helper: local mouse coords relative to section */
+    function localMouse(canvas) {
+      const r = canvas.parentElement.getBoundingClientRect();
+      return { x: gMx - r.left, y: gMy - r.top };
+    }
+
+    /* ── 1. ABOUT — Liquid colour swirls (purple/cyan) ── */
+    (function () {
+      const canvas = document.getElementById('aboutCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+
+      function fit() {
+        const r = canvas.parentElement.getBoundingClientRect();
+        canvas.width = r.width;
+        canvas.height = r.height;
+      }
+      fit();
+      window.addEventListener("resize", fit);
+
+      const blobs = Array.from({ length: 10 }, (_, i) => ({
+        x: Math.random() * 1200,
+        y: Math.random() * 800,
+        vx: (Math.random() - 0.5) * 0.4,
+        vy: (Math.random() - 0.5) * 0.4,
+        r: 140 + Math.random() * 130,
+        hue: i < 5 ? 265 + Math.random() * 45 : 180 + Math.random() * 25,
+        phase: Math.random() * Math.PI * 2
+      }));
+
+      let t = 0;
+
+      function draw() {
+        const w = canvas.width, h = canvas.height;
+
+        ctx.clearRect(0, 0, w, h);
+        ctx.fillStyle = '#060d1a';
+        ctx.fillRect(0, 0, w, h);
+
+        const m = {
+          x: gMx - canvas.parentElement.getBoundingClientRect().left,
+          y: gMy - canvas.parentElement.getBoundingClientRect().top
+        };
+
+        t += 0.004;
+
+        blobs.forEach((b) => {
+          const dx = m.x - b.x, dy = m.y - b.y;
+          const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+
+          b.vx += dx / dist * 0.12;
+          b.vy += dy / dist * 0.12;
+          b.vx *= 0.96;
+          b.vy *= 0.96;
+
+          b.x += b.vx;
+          b.y += b.vy;
+
+          const g = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, b.r);
+
+          g.addColorStop(0, `hsla(${b.hue},85%,50%,0.2)`);
+          g.addColorStop(1, `transparent`);
+
+          ctx.fillStyle = g;
+          ctx.beginPath();
+          ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+          ctx.fill();
+        });
+      }
+
+      CanvasEngine.register({ canvas, ctx, draw });
+    })();
+
+    /* ── 2. STACK — Particle network that bends toward cursor ── */
+    (function () {
+      const canvas = document.getElementById('stackCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      fitCanvas(canvas);
+      window.addEventListener('resize', () => fitCanvas(canvas));
+
+      const N = 90;
+      const pts = Array.from({ length: N }, () => ({
+        x: Math.random() * 1400,
+        y: Math.random() * 900,
+        vx: (Math.random() - 0.5) * 0.5,
+        vy: (Math.random() - 0.5) * 0.5,
+      }));
+      pts.forEach(p => { p.bx = p.x; p.by = p.y; });
+
+      function draw() {
+        const w = canvas.width, h = canvas.height;
+        const m = localMouse(canvas);
+        ctx.clearRect(0, 0, w, h);
+        ctx.fillStyle = '#03070f';
+        ctx.fillRect(0, 0, w, h);
+
+        const RADIUS = 200;
+
+        pts.forEach(p => {
+          const dx = m.x - p.x, dy = m.y - p.y;
+          const d = Math.sqrt(dx * dx + dy * dy) || 1;
+          if (d < RADIUS) {
+            const strength = (1 - d / RADIUS) * 1.8;
+            p.vx += dx / d * strength * 0.08;
+            p.vy += dy / d * strength * 0.08;
+          }
+          p.vx += (p.bx - p.x) * 0.003;
+          p.vy += (p.by - p.y) * 0.003;
+          p.vx *= 0.94; p.vy *= 0.94;
+          p.x += p.vx; p.y += p.vy;
+        });
+
+        ctx.lineWidth = 0.6;
+        for (let i = 0; i < N; i++) {
+          for (let j = i + 1; j < N; j++) {
+            const dx = pts[i].x - pts[j].x;
+            const dy = pts[i].y - pts[j].y;
+            const d = Math.sqrt(dx * dx + dy * dy);
+            if (d < 130) {
+              const alpha = (1 - d / 130) * 0.4;
+              ctx.strokeStyle = `rgba(0,229,255,${alpha})`;
+              ctx.beginPath();
+              ctx.moveTo(pts[i].x, pts[i].y);
+              ctx.lineTo(pts[j].x, pts[j].y);
+              ctx.stroke();
+            }
+          }
+        }
+
+        pts.forEach(p => {
+          const dm = Math.sqrt((m.x - p.x) ** 2 + (m.y - p.y) ** 2);
+          const glow = dm < 150 ? (1 - dm / 150) * 0.9 + 0.2 : 0.3;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(0,229,255,${glow})`;
+          ctx.shadowColor = 'rgba(0,229,255,0.6)';
+          ctx.shadowBlur = dm < 150 ? 8 : 2;
+          ctx.fill();
+        });
+        ctx.shadowBlur = 0;
+      }
+      CanvasEngine.register({ canvas, ctx, draw });
+    })();
+
+    /* ── 3. PROJECTS — Energy tendrils + debris + cursor shockwave ── */
+    let speed = 0;
+    (function () {
+      const canvas = document.getElementById('projectsCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      fitCanvas(canvas);
+      window.addEventListener('resize', () => fitCanvas(canvas));
+
+      let trailX = 400, trailY = 300;
+      let prevTrailX = 400, prevTrailY = 300;
+      let shockwaves = [];
+
+      // Debris particles — small sharp shards
+      const debris = Array.from({ length: 180 }, () => ({
+        x: Math.random() * 1600,
+        y: Math.random() * 1000,
+        vx: (Math.random() - 0.5) * 0.4,
+        vy: (Math.random() - 0.5) * 0.4,
+        size: 1 + Math.random() * 2.5,
+        hue: 240 + Math.random() * 70,
+        alpha: 0.2 + Math.random() * 0.5,
+        phase: Math.random() * Math.PI * 2
+      }));
+
+      // Tendril nodes — form organic lines toward cursor
+      const TNODES = 6;
+      const tendrils = Array.from({ length: TNODES }, (_, ti) => {
+        const nodes = Array.from({ length: 14 }, (__, ni) => ({
+          x: Math.random() * 1400, y: Math.random() * 900,
+          vx: 0, vy: 0,
+          hue: 250 + ti * 15
+        }));
+        return nodes;
+      });
+
+      // Click shockwave
+      canvas.parentElement.addEventListener('mousedown', e => {
+        const r = canvas.parentElement.getBoundingClientRect();
+        shockwaves.push({ x: e.clientX - r.left, y: e.clientY - r.top, r: 0, life: 1 });
+      });
+
+      function draw() {
+        const w = canvas.width, h = canvas.height;
+        const m = localMouse(canvas);
+
+        ctx.clearRect(0, 0, w, h);
+        ctx.fillStyle = '#020510';
+        ctx.fillRect(0, 0, w, h);
+
+        prevTrailX = trailX; prevTrailY = trailY;
+        trailX += (m.x - trailX) * 0.025;
+        trailY += (m.y - trailY) * 0.025;
+        let rawSpeed = Math.sqrt((trailX - prevTrailX) ** 2 + (trailY - prevTrailY) ** 2);
+        speed = (speed || 0) * 0.85 + rawSpeed * 0.15;
+
+        // ── Debris ──
+        debris.forEach(d => {
+          const dx = trailX - d.x, dy = trailY - d.y;
+          const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+          const pull = Math.max(0, 1 - dist / 320) * 0.06;
+          d.vx += dx / dist * pull + (Math.random() - 0.5) * 0.02;
+          d.vy += dy / dist * pull + (Math.random() - 0.5) * 0.02;
+          d.vx *= 0.98; d.vy *= 0.98;
+          d.x += d.vx; d.y += d.vy;
+          if (d.x < 0) d.x = w; if (d.x > w) d.x = 0;
+          if (d.y < 0) d.y = h; if (d.y > h) d.y = 0;
+          d.phase += 0.03;
+
+          const flicker = 0.6 + Math.sin(d.phase) * 0.4;
+          ctx.globalCompositeOperation = 'screen';
+          ctx.beginPath();
+          ctx.arc(d.x, d.y, d.size, 0, Math.PI * 2);
+          ctx.fillStyle = `hsla(${d.hue},80%,60%,${d.alpha * flicker})`;
+          ctx.fill();
+        });
+
+        // ── Tendrils ──
+        tendrils.forEach((nodes, ti) => {
+          // Head node chases cursor with lag
+          const lag = 0.004 + ti * 0.002;
+          nodes[0].x += (trailX - nodes[0].x) * lag;
+          nodes[0].y += (trailY - nodes[0].y) * lag;
+
+          // Each subsequent node chases previous with spring
+          for (let ni = 1; ni < nodes.length; ni++) {
+            const prev = nodes[ni - 1];
+            nodes[ni].vx += (prev.x - nodes[ni].x) * 0.018 + (Math.random() - 0.5) * 0.12;
+            nodes[ni].vy += (prev.y - nodes[ni].y) * 0.018 + (Math.random() - 0.5) * 0.12;
+            nodes[ni].vx *= 0.92; nodes[ni].vy *= 0.92;
+            nodes[ni].x += nodes[ni].vx;
+            nodes[ni].y += nodes[ni].vy;
+          }
+
+          // Draw tendril as gradient bezier path
+          ctx.globalCompositeOperation = 'screen';
+          ctx.beginPath();
+          ctx.moveTo(nodes[0].x, nodes[0].y);
+          for (let ni = 1; ni < nodes.length - 1; ni++) {
+            const mx = (nodes[ni].x + nodes[ni + 1].x) / 2;
+            const my = (nodes[ni].y + nodes[ni + 1].y) / 2;
+            ctx.quadraticCurveTo(nodes[ni].x, nodes[ni].y, mx, my);
+          }
+          const baseAlpha = 0.25 + Math.min(speed * 0.04, 0.4);
+          ctx.strokeStyle = `hsla(${nodes[0].hue},80%,65%,${baseAlpha})`;
+          ctx.lineWidth = 1.5 - ti * 0.15;
+          ctx.shadowColor = `hsla(${nodes[0].hue},100%,70%,0.5)`;
+          ctx.shadowBlur = 8 + speed * 1.5;
+          ctx.stroke();
+          ctx.shadowBlur = 0;
+        });
+
+        // ── Cursor energy core ──
+        ctx.globalCompositeOperation = 'screen';
+        const intensity = Math.min(speed * 0.15, 0.35) + 0.15;
+        const cg = ctx.createRadialGradient(trailX, trailY, 0, trailX, trailY, 160 + speed * 8);
+        cg.addColorStop(0, `rgba(140,60,255,${intensity})`);
+        cg.addColorStop(0.4, `rgba(80,40,200,${intensity * 0.4})`);
+        cg.addColorStop(1, 'transparent');
+        ctx.fillStyle = cg;
+        ctx.fillRect(0, 0, w, h);
+
+        // ── Shockwaves ──
+        shockwaves = shockwaves.filter(s => s.life > 0);
+        shockwaves.forEach(s => {
+          s.r += 6; s.life -= 0.025;
+          ctx.globalCompositeOperation = 'screen';
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+          ctx.strokeStyle = `rgba(160,80,255,${s.life * 0.5})`;
+          ctx.lineWidth = 2;
+          ctx.shadowColor = 'rgba(180,100,255,0.6)';
+          ctx.shadowBlur = 15;
+          ctx.stroke();
+          ctx.shadowBlur = 0;
+        });
+
+        ctx.globalCompositeOperation = 'source-over';
+      }
+      CanvasEngine.register({ canvas, ctx, draw });
+    })();
+
+    /* ── 4. PASSIONS — Aurora / borealis wave + scroll parallax ── */
+    (function () {
+      const canvas = document.getElementById('passionsCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      fitCanvas(canvas);
+      window.addEventListener('resize', () => fitCanvas(canvas));
+
+      let t = 0;
+      let scrollOffset = 0;
+      const bands = [
+        { hue: 160, speed: 0.4, amp: 60, freq: 0.003, y: 0.3, parallax: 0.8 },
+        { hue: 200, speed: 0.6, amp: 80, freq: 0.004, y: 0.5, parallax: 1.2 },
+        { hue: 280, speed: 0.5, amp: 50, freq: 0.002, y: 0.7, parallax: 0.6 },
+        { hue: 320, speed: 0.35, amp: 70, freq: 0.005, y: 0.4, parallax: 1.0 },
+      ];
+
+      // Track scroll relative to section
+      window.addEventListener('scroll', () => {
+        const rect = canvas.parentElement.getBoundingClientRect();
+        scrollOffset = -rect.top * 0.65;
+      });
+
+      function draw() {
+        const w = canvas.width, h = canvas.height;
+        const m = localMouse(canvas);
+        ctx.clearRect(0, 0, w, h);
+        ctx.fillStyle = '#030a12';
+        ctx.fillRect(0, 0, w, h);
+
+        t += 0.008;
+        const mx = (m.x / w - 0.5) * 60;
+
+        bands.forEach(b => {
+          ctx.globalCompositeOperation = 'screen';
+          ctx.beginPath();
+          // Parallax: each band moves at different rate on scroll
+          const cy = h * b.y + Math.sin(t * b.speed) * b.amp + (m.y / h - 0.5) * 40 + scrollOffset * b.parallax;
+          ctx.moveTo(0, cy);
+          for (let x = 0; x <= w; x += 4) {
+            const y = cy + Math.sin(x * b.freq + t * b.speed + mx * 0.01) * (b.amp + Math.sin(t * 0.3) * 20);
+            ctx.lineTo(x, y);
+          }
+          ctx.lineTo(w, h); ctx.lineTo(0, h); ctx.closePath();
+
+          const g = ctx.createLinearGradient(0, cy - b.amp, 0, cy + b.amp * 2);
+          g.addColorStop(0, `hsla(${b.hue},80%,60%,0.12)`);
+          g.addColorStop(0.5, `hsla(${b.hue + 30},70%,50%,0.07)`);
+          g.addColorStop(1, 'transparent');
+          ctx.fillStyle = g;
+          ctx.fill();
+        });
+
+        ctx.globalCompositeOperation = 'source-over';
+      }
+      CanvasEngine.register({ canvas, ctx, draw });
+    })();
+
+    /* ── 5. DASHBOARD — Matrix rain / data stream ── */
+    (function () {
+      const canvas = document.getElementById('dashboardCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      fitCanvas(canvas);
+      window.addEventListener('resize', () => fitCanvas(canvas));
+
+      const fontSize = 13;
+      const chars = '01アイウエオカキクケコサシスセソタチツテトナニヌネノ∆Ω∑≠≈<>{}[]|/\\%$#@';
+      let cols, drops;
+
+      function init() {
+        cols = Math.floor(canvas.width / fontSize);
+        drops = Array.from({ length: cols }, () => Math.random() * -100);
+      }
+      init();
+      window.addEventListener('resize', () => { fitCanvas(canvas); init(); });
+
+      function draw() {
+        const w = canvas.width, h = canvas.height;
+        const m = localMouse(canvas);
+        ctx.fillStyle = 'rgba(3,7,15,0.15)';
+        ctx.fillRect(0, 0, w, h);
+
+        ctx.font = `${fontSize}px "Share Tech Mono", monospace`;
+        const cursorR = 100;
+
+        for (let i = 0; i < drops.length; i++) {
+          const x = i * fontSize;
+          const y = drops[i] * fontSize;
+
+          const dm = Math.sqrt((m.x - x) ** 2 + (m.y - y) ** 2);
+          const inCircle = dm < cursorR;
+          const bright = inCircle ? 1 : 0.32;
+          const ch = chars[Math.floor(Math.random() * chars.length)];
+          const baseAlpha = Math.random() > 0.95 ? 1 : 0.5;
+
+          if (inCircle) {
+            // Green glow inside cursor
+            ctx.fillStyle = `rgba(0,255,100,${bright * baseAlpha})`;
+            ctx.shadowColor = 'rgba(0,255,80,0.7)';
+            ctx.shadowBlur = 0;
+          } else {
+            ctx.fillStyle = `rgba(0,229,255,${bright * baseAlpha})`;
+            ctx.shadowBlur = 0;
+          }
+          ctx.fillText(ch, x, y);
+
+          if (y > h && Math.random() > 0.975) drops[i] = 0;
+          drops[i] += 0.5;
+        }
+        ctx.shadowBlur = 6;
+
+        // Cursor circle — subtle dim ring, just a faint outline
+        ctx.strokeStyle = 'rgba(0,200,80,0.12)';
+        ctx.lineWidth = 1;
+        ctx.shadowBlur = 0;
+        ctx.beginPath();
+        ctx.arc(m.x, m.y, cursorR, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+
+      }
+      CanvasEngine.register({ canvas, ctx, draw });
+    })();
+
+    /* ── 6. STORY — Floating orbs / deep space ── */
+    (function () {
+      const canvas = document.getElementById('storyCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      fitCanvas(canvas);
+      window.addEventListener('resize', () => fitCanvas(canvas));
+
+      const orbs = Array.from({ length: 12 }, (_, i) => ({
+        x: Math.random() * 1200,
+        y: Math.random() * 900,
+        r: 40 + Math.random() * 100,
+        vx: (Math.random() - 0.5) * 0.15,
+        vy: (Math.random() - 0.5) * 0.15,
+        hue: 190 + i * 15,
+        phase: Math.random() * Math.PI * 2
+      }));
+
+      function draw() {
+        const w = canvas.width, h = canvas.height;
+        const m = localMouse(canvas);
+        ctx.clearRect(0, 0, w, h);
+        ctx.fillStyle = '#020810';
+        ctx.fillRect(0, 0, w, h);
+
+        orbs.forEach(o => {
+          const dx = m.x - o.x, dy = m.y - o.y;
+          const d = Math.sqrt(dx * dx + dy * dy) || 1;
+          // Gentle repulsion
+          if (d < 200) {
+            o.vx -= dx / d * (200 - d) * 0.0004;
+            o.vy -= dy / d * (200 - d) * 0.0004;
+          }
+          o.vx *= 0.99; o.vy *= 0.99;
+          o.x += o.vx; o.y += o.vy;
+          if (o.x < -o.r) o.x = w + o.r;
+          if (o.x > w + o.r) o.x = -o.r;
+          if (o.y < -o.r) o.y = h + o.r;
+          if (o.y > h + o.r) o.y = -o.r;
+          o.phase += 0.006;
+
+          ctx.globalCompositeOperation = 'screen';
+          const pulse = 1 + Math.sin(o.phase) * 0.1;
+          const g = ctx.createRadialGradient(o.x, o.y, 0, o.x, o.y, o.r * pulse);
+          g.addColorStop(0, `hsla(${o.hue},70%,55%,0.2)`);
+          g.addColorStop(0.5, `hsla(${o.hue},60%,40%,0.08)`);
+          g.addColorStop(1, 'transparent');
+          ctx.beginPath();
+          ctx.arc(o.x, o.y, o.r * pulse, 0, Math.PI * 2);
+          ctx.fillStyle = g;
+          ctx.fill();
+        });
+
+        ctx.globalCompositeOperation = 'source-over';
+      }
+      CanvasEngine.register({ canvas, ctx, draw });
+    })();
+
+    /* ── 7. CONTACT — Electric lightning field ── */
+    (function () {
+      const canvas = document.getElementById('contactCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      fitCanvas(canvas);
+      window.addEventListener('resize', () => fitCanvas(canvas));
+
+      const getCX = () => canvas.width / 2;
+
+      /* ─────────────────────────────
+         CLOUD LAYER (TOP SKY LINE)
+      ───────────────────────────── */
+
+      const cloudClusters = Array.from({ length: 14 }, (_, i) => ({
+        x: (canvas.width / 14) * i + (Math.random() - 0.5) * 120,
+        y: 80 + Math.random() * 60,
+        vx: (Math.random() - 0.5) * 0.05,
+        phase: Math.random() * Math.PI * 2
+      }));
+
+      const cloudParticles = Array.from({ length: 390 }, () => {
+        const c = cloudClusters[Math.floor(Math.random() * cloudClusters.length)];
+
+        const angle = Math.random() * Math.PI * 2;
+        const speed = 0.02 + Math.random() * 0.03;
+
+        return {
+          c,
+          ox: (Math.random() - 0.5) * 140,
+          oy: (Math.random() - 0.5) * 80,
+          r: 60 + Math.random() * 110,
+          drift: Math.random() * 0.3,
+
+          ax: Math.cos(angle) * speed,
+          ay: Math.sin(angle) * speed,
+
+          oxBase: (Math.random() - 0.5) * 75,
+          oyBase: (Math.random() - 0.5) * 75,
+          t: Math.random() * 1000,
+
+          // NEW: home position + velocity bounds
+          homeX: 0,
+          homeY: 0,
+          vx: (Math.random() - 0.5) * 0.2,
+          vy: (Math.random() - 0.5) * 0.2
+        };
+      });
+
+      /* FIX: set home positions after init */
+      for (const p of cloudParticles) {
+        const c = p.c;
+        p.homeX = c.x;
+        p.homeY = c.y;
+      }
+
+      /* ─────────────────────────────
+         LIGHTNING (unchanged)
+      ───────────────────────────── */
+
+      let bolts = [];
+      let timer = 0;
+
+      function makeBolt(x1, y1, x2, y2, depth) {
+        if (depth <= 0) return [{ x1, y1, x2, y2 }];
+
+        const mx = (x1 + x2) / 2 + (Math.random() - 0.5) * 70 * depth;
+        const my = (y1 + y2) / 2 + (Math.random() - 0.5) * 70 * depth;
+
+        return [
+          ...makeBolt(x1, y1, mx, my, depth - 1),
+          ...makeBolt(mx, my, x2, y2, depth - 1)
+        ];
+      }
+
+      function randomCloudPoint() {
+        const c = cloudClusters[Math.floor(Math.random() * cloudClusters.length)];
+        return {
+          x: c.x + (Math.random() - 0.5) * 120,
+          y: c.y + (Math.random() - 0.5) * 40
+        };
+      }
+
+      function spawnBolt(mx, my) {
+
+        const start = randomCloudPoint();
+
+        // stabile Form erzeugen
+        const segs = makeBolt(start.x, start.y, mx, my, 3);
+
+        return {
+          startX: start.x,
+          startY: start.y,
+          segs,
+          life: 0,
+          grow: 0
+        };
+      }
+
+      /* ─────────────────────────────
+         DRAW CLOUD (BOUNDED MOTION FIX)
+      ───────────────────────────── */
+
+      function drawCloud() {
+        ctx.globalCompositeOperation = 'source-over';
+
+        for (const p of cloudParticles) {
+
+          const c = p.c;
+
+          // ❌ FIX: stabile Cluster-Referenz bleibt Basis
+          const baseX = c.x + p.oxBase;
+          const baseY = c.y + p.oyBase;
+
+          // ─────────────────────────────
+          // INIT (nur einmal sinnvoll)
+          // ─────────────────────────────
+          if (p.x === undefined) {
+            p.x = baseX;
+            p.y = baseY;
+            p.vx = 0;
+            p.vy = 0;
+          }
+
+          const t = performance.now() * 0.001;
+
+          // smoother wind-like force
+          p.vx += (Math.random() - 0.5) * 0.02 + Math.sin(t + p.r) * 0.003;
+          p.vy += (Math.random() - 0.5) * 0.02 + Math.cos(t + p.r) * 0.003;
+
+          // damping
+          p.vx *= 0.99;
+          p.vy *= 0.99;
+
+          // integrate position
+          p.x += p.vx;
+          p.y += p.vy;
+
+          // hard boundary around base
+          const dx = p.x - baseX;
+          const dy = p.y - baseY;
+
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          const maxRadius = 75;
+
+          if (dist > maxRadius) {
+            const nx = dx / dist;
+            const ny = dy / dist;
+
+            p.x = baseX + nx * maxRadius;
+            p.y = baseY + ny * maxRadius;
+
+            p.vx *= -0.5;
+            p.vy *= -0.5;
+          }
+
+          const baseRadius = p.r * 1.25;
+
+          // 3-layer "fake metaball"
+          for (let i = 0; i < 3; i++) {
+
+            const a = i * (Math.PI * 2 / 3);
+
+            const ox = Math.cos(a + p.t * 0.001) * 18;
+            const oy = Math.sin(a + p.t * 0.001) * 14;
+
+            const r = baseRadius * (0.75 + i * 0.18);
+
+            const g = ctx.createRadialGradient(
+              p.x + ox,
+              p.y + oy,
+              0,
+              p.x + ox,
+              p.y + oy,
+              r
+            );
+
+            g.addColorStop(0, 'rgba(40,50,70,0.16)');
+            g.addColorStop(0.6, 'rgba(35,45,65,0.06)');
+            g.addColorStop(1, 'transparent');
+
+            ctx.fillStyle = g;
+
+            ctx.beginPath();
+            ctx.arc(p.x + ox, p.y + oy, r, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+
+        ctx.globalCompositeOperation = 'source-over';
+      }
+
+      /* ─────────────────────────────
+         LIGHTNING DRAW (UNCHANGED)
+      ───────────────────────────── */
+
+      function drawBolts(mx, my) {
+
+        for (const b of bolts) {
+
+          if (b.grow < 1) {
+            b.grow += 0.02;
+            continue;
+          }
+
+          b.life += 0.05;
+
+          const alpha = Math.pow(1 - b.life, 2) * 0.5;
+
+          // 🔥 nur letztes Segment auf Cursor ziehen
+          const last = b.segs[b.segs.length - 1];
+
+          last.x2 = mx;
+          last.y2 = my;
+
+          for (const s of b.segs) {
+
+            ctx.save();
+
+            ctx.beginPath();
+            ctx.moveTo(s.x1, s.y1);
+            ctx.lineTo(s.x2, s.y2);
+
+            ctx.strokeStyle = `rgba(0,229,255,${alpha})`;
+            ctx.lineWidth = 0.6;
+
+            ctx.shadowColor = `rgba(0,229,255,0.2)`;
+            ctx.shadowBlur = 6;
+
+            ctx.stroke();
+
+            ctx.restore();
+          }
+        }
+
+        bolts = bolts.filter(b => b.life < 1);
+
+        ctx.shadowBlur = 0;
+        ctx.shadowColor = 'transparent';
+      }
+
+      /* ─────────────────────────────
+         MAIN LOOP
+      ───────────────────────────── */
+
+      function draw() {
+        const w = canvas.width, h = canvas.height;
+        const m = localMouse(canvas);
+
+        ctx.clearRect(0, 0, w, h);
+
+        ctx.fillStyle = 'rgba(3,7,15,1)';
+        ctx.fillRect(0, 0, w, h);
+
+        drawCloud();
+
+        timer++;
+
+        const spawnChance = 0.03;
+
+        if (Math.random() < spawnChance && bolts.length < 2) {
+          bolts.push(spawnBolt(m.x, m.y));
+        }
+
+        drawBolts(m.x, m.y);
+
+        const g = ctx.createRadialGradient(getCX(), 80, 0, getCX(), 80, 300);
+        g.addColorStop(0, 'rgba(0,229,255,0.025)');
+        g.addColorStop(1, 'transparent');
+
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, w, h);
+      }
+
+      CanvasEngine.register({ canvas, ctx, draw });
+    })();
+    CanvasEngine.start();
+  </script>
+
 </body>
 
 </html>
