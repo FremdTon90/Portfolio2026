@@ -278,15 +278,254 @@
       font-size: clamp(2.5rem, 6vw, 5.5rem);
       font-weight: 900;
       line-height: 1.05;
-      color: #fff;
       text-transform: uppercase;
       letter-spacing: 0.04em;
       opacity: 0;
-      animation: fadein-up 0.8s 0.5s forwards;
+      animation: fadein-up 0.8s 0.5s forwards, glitch-master 3.5s 1.5s infinite;
+      position: relative;
+      background-image: url('forest.jpg');
+      background-size: 100vw auto;
+      background-position: left 38%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      color: transparent;
+      filter: brightness(1.6) contrast(1.15) saturate(1.1);
+    }
+
+    .hero-name::before,
+    .hero-name::after {
+      content: attr(data-text);
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url('forest.jpg');
+      background-size: 100vw auto;
+      background-position: left 38%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      color: transparent;
+      font-family: var(--font-display);
+      font-size: clamp(2.5rem, 6vw, 5.5rem);
+      font-weight: 900;
+      line-height: 1.05;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      opacity: 0;
+      pointer-events: none;
+      mix-blend-mode: screen;
+    }
+
+    .hero-name::before {
+      animation: glitch-layer-1 3.5s 1.5s infinite;
+      /* cyan/blue channel left */
+      filter: hue-rotate(180deg) brightness(2) saturate(3);
+    }
+
+    .hero-name::after {
+      animation: glitch-layer-2 3.5s 1.5s infinite;
+      /* red/magenta channel right */
+      filter: hue-rotate(-60deg) brightness(2) saturate(3);
     }
 
     .hero-name .accent {
-      color: var(--cyan);
+      /* accent word: boost with cyan tint overlay via text-shadow */
+      text-shadow:
+        0 0 30px rgba(0, 229, 255, 0.6),
+        0 0 60px rgba(0, 229, 255, 0.3);
+    }
+
+    /* ── GLITCH KEYFRAMES ── */
+    @keyframes glitch-master {
+
+      0%,
+      72%,
+      100% {
+        transform: none;
+        filter: brightness(1.6) contrast(1.15) saturate(1.1);
+      }
+
+      73% {
+        transform: translate(-5px, 2px) skewX(-1.2deg);
+        filter: brightness(2.2) contrast(1.8);
+      }
+
+      74% {
+        transform: translate(7px, -3px) skewX(2deg) scaleX(1.015);
+        filter: brightness(0.7) contrast(2.2) saturate(0.3);
+      }
+
+      75% {
+        transform: translate(-3px, 5px) skewX(-0.8deg);
+        filter: brightness(2) saturate(2);
+      }
+
+      76% {
+        transform: none;
+        filter: brightness(1.6) contrast(1.15) saturate(1.1);
+      }
+
+      79% {
+        transform: translate(0, 0);
+        filter: brightness(4) contrast(3) saturate(0) invert(0.15);
+      }
+
+      79.4% {
+        transform: none;
+        filter: brightness(1.6) contrast(1.15) saturate(1.1);
+      }
+
+      83% {
+        transform: translate(5px, -1px) skewX(-1.8deg);
+        filter: brightness(2);
+      }
+
+      84% {
+        transform: translate(-8px, 3px) scaleY(1.008);
+        filter: brightness(1.6) contrast(1.15);
+      }
+
+      84.5% {
+        transform: none;
+        filter: brightness(1.6) contrast(1.15) saturate(1.1);
+      }
+
+      88% {
+        transform: translate(4px, 0) skewX(1deg);
+        filter: brightness(1.9) saturate(1.5);
+      }
+
+      88.5% {
+        transform: none;
+        filter: brightness(1.6) contrast(1.15) saturate(1.1);
+      }
+    }
+
+    @keyframes glitch-layer-1 {
+
+      0%,
+      72%,
+      100% {
+        opacity: 0;
+        transform: none;
+      }
+
+      73% {
+        opacity: 1;
+        transform: translate(-10px, 0);
+        clip-path: polygon(0 8%, 100% 8%, 100% 28%, 0 28%);
+      }
+
+      74% {
+        opacity: 0.8;
+        transform: translate(8px, 0) scaleX(1.03);
+        clip-path: polygon(0 52%, 100% 52%, 100% 72%, 0 72%);
+      }
+
+      75% {
+        opacity: 1;
+        transform: translate(-14px, 2px);
+        clip-path: polygon(0 0%, 100% 0%, 100% 14%, 0 14%);
+      }
+
+      76% {
+        opacity: 0;
+      }
+
+      79% {
+        opacity: 1;
+        transform: translate(10px, 0);
+        clip-path: polygon(0 32%, 100% 32%, 100% 50%, 0 50%);
+      }
+
+      79.4% {
+        opacity: 0;
+      }
+
+      83% {
+        opacity: 0.9;
+        transform: translate(-12px, 0);
+        clip-path: polygon(0 62%, 100% 62%, 100% 82%, 0 82%);
+      }
+
+      84% {
+        opacity: 0;
+      }
+
+      88% {
+        opacity: 0.85;
+        transform: translate(7px, 0);
+        clip-path: polygon(0 18%, 100% 18%, 100% 38%, 0 38%);
+      }
+
+      88.5% {
+        opacity: 0;
+      }
+    }
+
+    @keyframes glitch-layer-2 {
+
+      0%,
+      72%,
+      100% {
+        opacity: 0;
+        transform: none;
+      }
+
+      73% {
+        opacity: 0.9;
+        transform: translate(12px, 0);
+        clip-path: polygon(0 62%, 100% 62%, 100% 82%, 0 82%);
+      }
+
+      74% {
+        opacity: 0.7;
+        transform: translate(-10px, 0);
+        clip-path: polygon(0 18%, 100% 18%, 100% 38%, 0 38%);
+      }
+
+      75% {
+        opacity: 1;
+        transform: translate(16px, -2px);
+        clip-path: polygon(0 76%, 100% 76%, 100% 96%, 0 96%);
+      }
+
+      76% {
+        opacity: 0;
+      }
+
+      79% {
+        opacity: 0.8;
+        transform: translate(-11px, 0);
+        clip-path: polygon(0 4%, 100% 4%, 100% 22%, 0 22%);
+      }
+
+      79.4% {
+        opacity: 0;
+      }
+
+      83% {
+        opacity: 0.9;
+        transform: translate(13px, 0);
+        clip-path: polygon(0 42%, 100% 42%, 100% 60%, 0 60%);
+      }
+
+      84% {
+        opacity: 0;
+      }
+
+      88% {
+        opacity: 0.75;
+        transform: translate(-8px, 0);
+        clip-path: polygon(0 78%, 100% 78%, 100% 100%, 0 100%);
+      }
+
+      88.5% {
+        opacity: 0;
+      }
     }
 
     .hero-subtitle {
@@ -741,7 +980,7 @@
       }
     }
 
-    /* ── PROJECTS ── */
+    /* ── PROJECTS BG — Hex Grid Canvas ── */
     #projects {
       min-height: 200vh;
       padding: 6rem 0;
@@ -749,6 +988,15 @@
       border-bottom: 1px solid var(--border);
       display: block;
       position: relative;
+    }
+
+    #projectsCanvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
     }
 
     .projects-grid {
@@ -1070,6 +1318,12 @@
       letter-spacing: 0.1em;
     }
 
+    /* ── cursor: none everywhere in projects ── */
+    #projects,
+    #projects * {
+      cursor: none !important;
+    }
+
     /* ── PASSIONS / MULTI-DISCIPLINE ── */
     #passions {
       min-height: 100vh;
@@ -1093,12 +1347,12 @@
     }
 
     .passion-card {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      padding: 1.3rem 1.3rem;
+      background: linear-gradient(145deg, rgba(10, 14, 24, 0.92), rgba(6, 10, 18, 0.96));
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 1.4rem 1.4rem 1.3rem;
       position: relative;
       overflow: hidden;
-      transition: all 0.3s;
+      transition: border-color 0.35s ease, box-shadow 0.35s ease;
       clip-path: polygon(0 0,
           calc(100% - 8px) 0,
           100% 8px,
@@ -1107,30 +1361,92 @@
           0 calc(100% - 8px));
       display: flex;
       flex-direction: column;
-      gap: 0.5rem;
+      gap: 0.45rem;
+      cursor: none;
+    }
+
+    /* shimmer sweep — like tech-item */
+    .passion-card::before {
+      content: '';
+      position: absolute;
+      inset: -40%;
+      background: linear-gradient(120deg,
+          transparent 40%,
+          rgba(0, 229, 255, 0.06),
+          transparent 60%);
+      transform: translateX(-60%);
+      transition: transform 0.8s ease;
+      pointer-events: none;
+    }
+
+    .passion-card:hover::before {
+      transform: translateX(60%);
+    }
+
+    /* top accent line */
+    .passion-card::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(0, 229, 255, 0.5), transparent);
+      opacity: 0;
+      transition: opacity 0.35s ease;
+    }
+
+    .passion-card:hover::after {
+      opacity: 1;
+    }
+
+    .passion-card:hover {
+      border-color: rgba(0, 229, 255, 0.28);
+      box-shadow:
+        0 8px 32px rgba(0, 229, 255, 0.07),
+        0 0 0 1px rgba(0, 229, 255, 0.04) inset;
+    }
+
+    /* number badge */
+    .passion-num {
+      position: absolute;
+      top: 0.75rem;
+      right: 0.9rem;
+      font-family: var(--font-mono);
+      font-size: 0.58rem;
+      color: rgba(0, 229, 255, 0.18);
+      letter-spacing: 0.18em;
+      transition: color 0.3s;
+    }
+
+    .passion-card:hover .passion-num {
+      color: rgba(0, 229, 255, 0.5);
     }
 
     .passion-icon {
-      font-size: 2rem;
-      margin-bottom: 0.2rem;
+      font-size: 1.8rem;
       display: block;
+      transition: filter 0.35s ease;
+      filter: drop-shadow(0 0 0px rgba(0, 229, 255, 0));
+    }
+
+    .passion-card:hover .passion-icon {
+      filter: drop-shadow(0 0 6px rgba(0, 229, 255, 0.4));
     }
 
     .passion-title {
       font-family: var(--font-display);
-      font-size: 0.95rem;
+      font-size: 0.88rem;
       font-weight: 700;
       color: var(--cyan);
       text-transform: uppercase;
       letter-spacing: 0.1em;
-      margin-bottom: 0.2rem;
     }
 
     .passion-desc {
       color: var(--text-dim);
-      font-size: 0.92rem;
-      line-height: 1.4;
-
+      font-size: 0.88rem;
+      line-height: 1.45;
       overflow: visible;
     }
 
@@ -1777,7 +2093,7 @@
 
   <!-- PROJECTS -->
   <section id="projects">
-    <canvas class="section-canvas" id="projectsCanvas"></canvas>
+    <canvas id="projectsCanvas"></canvas>
 
     <div class="section-wrapper">
       <div class="section-header reveal">
@@ -1955,6 +2271,7 @@
       </div>
       <div class="passions-grid">
         <div class="passion-card reveal">
+          <span class="passion-num">01</span>
           <span class="passion-icon">🌐</span>
           <div class="passion-title">Web als Medium</div>
           <p class="passion-desc">Das Web ist das stärkste kreative Medium unserer Zeit:
@@ -1962,18 +2279,21 @@
             die bisher nur selten genutzt oder überhaupt erkannt wurden.</p>
         </div>
         <div class="passion-card reveal">
+          <span class="passion-num">02</span>
           <span class="passion-icon">🤖</span>
           <div class="passion-title">Robotik & Sensorik</div>
           <p class="passion-desc">Ich liebe es, wenn Software auf die physische Welt trifft. Sensordaten, Aktoren,
             Regelkreise — Mechatronik ist meine zweite Muttersprache.</p>
         </div>
         <div class="passion-card reveal">
+          <span class="passion-num">03</span>
           <span class="passion-icon">📐</span>
           <div class="passion-title">CAD & Design</div>
           <p class="passion-desc">Präzision ist Standard. CAD hat mir beigebracht,
             dass Design Funktion ist — ein Grundsatz, der sich durch alles zieht, was ich mache.</p>
         </div>
         <div class="passion-card reveal">
+          <span class="passion-num">04</span>
           <span class="passion-icon">🎛️</span>
           <div class="passion-title">Musik & Sound</div>
           <p class="passion-desc">20 Jahre Musikproduktion. Ich höre Musik nicht nur –
@@ -1981,6 +2301,7 @@
             und verwandle sie in soundreaktive Visuals, die jeden Beat sichtbar machen.</p>
         </div>
         <div class="passion-card reveal">
+          <span class="passion-num">05</span>
           <span class="passion-icon">✏️</span>
           <div class="passion-title">Illustration & Grafik</div>
           <p class="passion-desc">Ich zeichne und baue Grafiken aus Überzeugung,
@@ -1988,6 +2309,7 @@
             zwischen gutem und außergewöhnlichem Design ist.</p>
         </div>
         <div class="passion-card reveal">
+          <span class="passion-num">06</span>
           <span class="passion-icon">⚡</span>
           <div class="passion-title">Continuous Learning</div>
           <p class="passion-desc">Was ich nicht kann, bringe ich mir selbst bei —
@@ -2225,7 +2547,7 @@
     }
     animRing();
     const hoverTargets = document.querySelectorAll(
-      'a, button, .tech-item, .project-card, .passion-card, input, textarea, select, [role="button"]'
+      'a, button, .tech-item, input, textarea, select, [role="button"]'
     );
 
     hoverTargets.forEach(el => {
@@ -2639,143 +2961,117 @@
       CanvasEngine.register({ canvas, ctx, draw });
     })();
 
-    /* ── 3. PROJECTS — Energy tendrils + debris + cursor shockwave ── */
-    let speed = 0;
+    /* ── 3. PROJECTS — Hex grid, cursor-reactive glow + click pulse ── */
     (function () {
       const canvas = document.getElementById('projectsCanvas');
       if (!canvas) return;
       const ctx = canvas.getContext('2d');
       fitCanvas(canvas);
-      window.addEventListener('resize', () => fitCanvas(canvas));
+      window.addEventListener('resize', () => { fitCanvas(canvas); buildGrid(); });
 
-      let trailX = 400, trailY = 300;
-      let prevTrailX = 400, prevTrailY = 300;
-      let shockwaves = [];
+      const HEX_R = 34;
+      const sqrt3 = Math.sqrt(3);
+      let hexes = [];
 
-      const debris = Array.from({ length: 180 }, () => ({
-        x: Math.random() * 1600,
-        y: Math.random() * 1000,
-        vx: (Math.random() - 0.5) * 0.4,
-        vy: (Math.random() - 0.5) * 0.4,
-        size: 1 + Math.random() * 2.5,
-        hue: 240 + Math.random() * 70,
-        alpha: 0.2 + Math.random() * 0.5,
-        phase: Math.random() * Math.PI * 2
-      }));
+      function buildGrid() {
+        hexes = [];
+        const w = canvas.width, h = canvas.height;
+        const colW = sqrt3 * HEX_R;
+        const rowH = 1.5 * HEX_R;
+        const cols = Math.ceil(w / colW) + 3;
+        const rows = Math.ceil(h / rowH) + 3;
+        for (let row = -1; row < rows; row++) {
+          for (let col = -1; col < cols; col++) {
+            const x = col * colW + (row % 2 !== 0 ? colW / 2 : 0);
+            const y = row * rowH;
+            hexes.push({ x, y, glow: 0, pulse: 0, pulseDelay: 0 });
+          }
+        }
+      }
+      buildGrid();
 
-      const TNODES = 6;
-      const tendrils = Array.from({ length: TNODES }, (_, ti) => {
-        const nodes = Array.from({ length: 14 }, (__, ni) => ({
-          x: Math.random() * 1400, y: Math.random() * 900,
-          vx: 0, vy: 0,
-          hue: 250 + ti * 15
-        }));
-        return nodes;
-      });
+      function drawHex(x, y, r) {
+        ctx.beginPath();
+        for (let i = 0; i < 6; i++) {
+          const a = Math.PI / 180 * (60 * i - 30);
+          const px = x + r * Math.cos(a);
+          const py = y + r * Math.sin(a);
+          i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+        }
+        ctx.closePath();
+      }
 
-      canvas.parentElement.addEventListener('mousedown', e => {
+      let clickPulses = [];
+
+      canvas.parentElement.addEventListener('click', e => {
         const r = canvas.parentElement.getBoundingClientRect();
-        shockwaves.push({ x: e.clientX - r.left, y: e.clientY - r.top, r: 0, life: 1 });
+        const cx = e.clientX - r.left, cy = e.clientY - r.top;
+        clickPulses.push({ x: cx, y: cy, t: 0 });
       });
 
       function draw() {
         const w = canvas.width, h = canvas.height;
         const m = localMouse(canvas);
-
         ctx.clearRect(0, 0, w, h);
-        ctx.fillStyle = '#020510';
+
+        // deep bg
+        ctx.fillStyle = '#030810';
         ctx.fillRect(0, 0, w, h);
 
-        prevTrailX = trailX; prevTrailY = trailY;
-        trailX += (m.x - trailX) * 0.045;
-        trailY += (m.y - trailY) * 0.045;
-        let rawSpeed = Math.sqrt((trailX - prevTrailX) ** 2 + (trailY - prevTrailY) ** 2);
-        speed = (speed || 0) * 0.85 + rawSpeed * 0.15;
+        // advance click pulses
+        clickPulses = clickPulses.filter(p => p.t < 1);
+        clickPulses.forEach(p => p.t += 0.012);
 
-        debris.forEach(d => {
-          const dx = trailX - d.x, dy = trailY - d.y;
-          const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-          const pull = Math.max(0, 1 - dist / 320) * 0.06;
-          d.vx += dx / dist * pull + (Math.random() - 0.5) * 0.02;
-          d.vy += dy / dist * pull + (Math.random() - 0.5) * 0.02;
-          d.vx *= 0.98; d.vy *= 0.98;
-          d.x += d.vx; d.y += d.vy;
-          if (d.x < 0) d.x = w; if (d.x > w) d.x = 0;
-          if (d.y < 0) d.y = h; if (d.y > h) d.y = 0;
-          d.phase += 0.03;
+        hexes.forEach(hex => {
+          // cursor proximity glow
+          const dx = m.x - hex.x, dy = m.y - hex.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          const targetGlow = dist < 220 ? Math.pow(1 - dist / 220, 1.8) : 0;
+          hex.glow += (targetGlow - hex.glow) * 0.1;
 
-          const flicker = 0.6 + Math.sin(d.phase) * 0.4;
-          ctx.globalCompositeOperation = 'screen';
-          ctx.beginPath();
-          ctx.arc(d.x, d.y, d.size, 0, Math.PI * 2);
-          ctx.fillStyle = `hsla(${d.hue},80%,60%,${d.alpha * flicker})`;
-          ctx.fill();
-        });
+          // click pulse waves
+          let pulseVal = 0;
+          clickPulses.forEach(p => {
+            const pd = Math.sqrt((p.x - hex.x) ** 2 + (p.y - hex.y) ** 2);
+            const waveFront = p.t * 900;
+            const delta = Math.abs(pd - waveFront);
+            if (delta < 55) {
+              pulseVal = Math.max(pulseVal, (1 - delta / 55) * (1 - p.t));
+            }
+          });
 
-        tendrils.forEach((nodes, ti) => {
-          const lag = 0.003 + ti * 0.0012;
-          nodes[0].x += (trailX - nodes[0].x) * lag;
-          nodes[0].y += (trailY - nodes[0].y) * lag;
+          const g = Math.max(hex.glow, pulseVal);
+          const edgeAlpha = 0.035 + g * 0.55;
+          const fillAlpha = g * 0.09;
 
-          for (let ni = 1; ni < nodes.length; ni++) {
-            const prev = nodes[ni - 1];
-            const dx = prev.x - nodes[ni].x;
-            const dy = prev.y - nodes[ni].y;
-            const targetVX = dx * 0.015;
-            const targetVY = dy * 0.015;
+          drawHex(hex.x, hex.y, HEX_R - 1.5);
 
-            nodes[ni].vx += (targetVX - nodes[ni].vx) * 0.08;
-            nodes[ni].vy += (targetVY - nodes[ni].vy) * 0.08;
-            nodes[ni].vx += (Math.random() - 0.5) * 0.02;
-            nodes[ni].vy += (Math.random() - 0.5) * 0.02;
-            nodes[ni].vx *= 0.88;
-            nodes[ni].vy *= 0.88;
-            nodes[ni].x += nodes[ni].vx;
-            nodes[ni].y += nodes[ni].vy;
+          if (fillAlpha > 0.004) {
+            ctx.fillStyle = `rgba(0,229,255,${fillAlpha})`;
+            ctx.fill();
           }
 
-          ctx.globalCompositeOperation = 'screen';
-          ctx.beginPath();
-          ctx.moveTo(nodes[0].x, nodes[0].y);
-          for (let ni = 1; ni < nodes.length - 1; ni++) {
-            const mx = (nodes[ni].x + nodes[ni + 1].x) / 2;
-            const my = (nodes[ni].y + nodes[ni + 1].y) / 2;
-            ctx.quadraticCurveTo(nodes[ni].x, nodes[ni].y, mx, my);
-          }
-          const baseAlpha = 0.25 + Math.min(speed * 0.04, 0.4);
-          ctx.strokeStyle = `hsla(${nodes[0].hue},80%,65%,${baseAlpha})`;
-          ctx.lineWidth = 1.5 - ti * 0.15;
-          ctx.shadowColor = `hsla(${nodes[0].hue},100%,70%,0.5)`;
-          ctx.shadowBlur = 8 + speed * 1.5;
+          ctx.strokeStyle = `rgba(0,229,255,${edgeAlpha})`;
+          ctx.lineWidth = 0.5 + g * 1.2;
           ctx.stroke();
-          ctx.shadowBlur = 0;
+
+          // inner accent dot for high-glow hexes
+          if (g > 0.5) {
+            ctx.beginPath();
+            ctx.arc(hex.x, hex.y, 2 + g * 3, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(0,229,255,${g * 0.35})`;
+            ctx.fill();
+          }
         });
 
-        ctx.globalCompositeOperation = 'screen';
-        const intensity = Math.min(speed * 0.15, 0.35) + 0.15;
-        const cg = ctx.createRadialGradient(trailX, trailY, 0, trailX, trailY, 160 + speed * 8);
-        cg.addColorStop(0, `rgba(140,60,255,${intensity})`);
-        cg.addColorStop(0.4, `rgba(80,40,200,${intensity * 0.4})`);
-        cg.addColorStop(1, 'transparent');
-        ctx.fillStyle = cg;
+        // soft radial vignette around cursor
+        const gr = ctx.createRadialGradient(m.x, m.y, 0, m.x, m.y, 260);
+        gr.addColorStop(0, 'rgba(0,229,255,0.05)');
+        gr.addColorStop(1, 'transparent');
+        ctx.fillStyle = gr;
         ctx.fillRect(0, 0, w, h);
-
-        shockwaves = shockwaves.filter(s => s.life > 0);
-        shockwaves.forEach(s => {
-          s.r += 6; s.life -= 0.025;
-          ctx.globalCompositeOperation = 'screen';
-          ctx.beginPath();
-          ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-          ctx.strokeStyle = `rgba(160,80,255,${s.life * 0.5})`;
-          ctx.lineWidth = 2;
-          ctx.shadowColor = 'rgba(180,100,255,0.6)';
-          ctx.shadowBlur = 15;
-          ctx.stroke();
-          ctx.shadowBlur = 0;
-        });
-
-        ctx.globalCompositeOperation = 'source-over';
       }
+
       CanvasEngine.register({ canvas, ctx, draw });
     })();
 
@@ -2841,62 +3137,157 @@
       if (!canvas) return;
       const ctx = canvas.getContext('2d');
       fitCanvas(canvas);
-      window.addEventListener('resize', () => fitCanvas(canvas));
 
-      const fontSize = 13;
-      const chars = '01アイウエオカキクケコサシスセソタチツテトナニヌネノ∆Ω∑≠≈<>{}[]|/\\%$#@';
-      let cols, drops;
+      const ov = document.createElement('canvas');
+      ov.style.cssText = 'position:absolute;inset:0;pointer-events:none;z-index:0;width:100%;height:100%;';
+      canvas.parentElement.appendChild(ov);
+      const ovCtx = ov.getContext('2d');
+
+      function syncSize() {
+        fitCanvas(canvas);
+        ov.width = canvas.width;
+        ov.height = canvas.height;
+      }
+      syncSize();
+      window.addEventListener('resize', () => { syncSize(); init(); });
+
+      const fontSize = 16;
+      const SPAWN_PROB = 0.022;
+      const MAX_PER_COL = 4;
+      const TAIL_LEN = 38;
+
+      /* alpha per trail position: head=index 0, tail fades out */
+      var TAIL_ALPHAS = Array.from({ length: TAIL_LEN + 2 }, function (_, i) {
+        return i === 0 ? 0.42 : Math.max(0.001, 0.42 * Math.pow(0.84, i));
+      });
+
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789' +
+        '!@#$%&*?><[]{}|/\+=_-;:,.~^äöüÄÖÜß' +
+        'アイウエオカキクケコサシスセソ∆Ω∑≠≈∞§';
+
+      function rndChar() { return chars[Math.floor(Math.random() * chars.length)]; }
+
+      /* Drop: y and speed in ROWS (1 row = fontSize px).
+         Each time the drop enters a new integer row, the previous
+         head char is frozen into trail[] at that grid row.
+         Characters never move after placement — only the head advances. */
+      function makeDrop(startY) {
+        var row = Math.floor(startY);
+        return {
+          y: startY,
+          speed: 0.4 + Math.random() * 0.45,   /* rows/frame */
+          headRow: row,
+          headCh: rndChar(),
+          trail: []   /* [{row, ch}] newest-first */
+        };
+      }
+
+      let cols, columns;
 
       function init() {
         cols = Math.floor(canvas.width / fontSize);
-        drops = Array.from({ length: cols }, () => Math.random() * -100);
+        columns = Array.from({ length: cols }, () => {
+          var n = Math.random() < 0.4 ? 2 : 1;
+          return Array.from({ length: n }, () => makeDrop(-(Math.random() * 160)));
+        });
       }
       init();
-      window.addEventListener('resize', () => { fitCanvas(canvas); init(); });
+
+      const cursorR = 110;
 
       function draw() {
-        const w = canvas.width, h = canvas.height;
-        const m = localMouse(canvas);
-        ctx.fillStyle = 'rgba(3,7,15,0.15)';
-        ctx.fillRect(0, 0, w, h);
+        var w = canvas.width, h = canvas.height;
+        var m = localMouse(canvas);
 
-        ctx.font = `${fontSize}px "Share Tech Mono", monospace`;
-        const cursorR = 100;
+        ctx.clearRect(0, 0, w, h);
+        ctx.font = fontSize + 'px "Share Tech Mono", monospace';
 
-        for (let i = 0; i < drops.length; i++) {
-          const x = i * fontSize;
-          const y = drops[i] * fontSize;
+        for (var i = 0; i < cols; i++) {
+          var x = i * fontSize;
 
-          const dm = Math.sqrt((m.x - x) ** 2 + (m.y - y) ** 2);
-          const inCircle = dm < cursorR;
-          const bright = inCircle ? 1 : 0.32;
-          const ch = chars[Math.floor(Math.random() * chars.length)];
-          const baseAlpha = Math.random() > 0.95 ? 1 : 0.5;
-
-          if (inCircle) {
-            ctx.fillStyle = `rgba(0,255,100,${bright * baseAlpha})`;
-            ctx.shadowColor = 'rgba(0,255,80,0.7)';
-            ctx.shadowBlur = 0;
-          } else {
-            ctx.fillStyle = `rgba(0,229,255,${bright * baseAlpha})`;
-            ctx.shadowBlur = 0;
+          /* spawn */
+          if (columns[i].length < MAX_PER_COL && Math.random() < SPAWN_PROB) {
+            columns[i].push(makeDrop(0));
           }
-          ctx.fillText(ch, x, y);
 
-          if (y > h && Math.random() > 0.975) drops[i] = 0;
-          drops[i] += 0.5;
+          columns[i] = columns[i].filter(function (drop) {
+            drop.y += drop.speed;
+            var newRow = Math.floor(drop.y);
+
+            /* every time we enter a new grid row, freeze current head into trail */
+            if (newRow > drop.headRow) {
+              drop.trail.unshift({ row: drop.headRow, ch: drop.headCh });
+              if (drop.trail.length > TAIL_LEN) drop.trail.pop();
+              drop.headRow = newRow;
+              drop.headCh = rndChar();   /* fresh char for the new row */
+            }
+
+            /* draw trail — fixed grid positions, stable chars */
+            for (var t = 0; t < drop.trail.length; t++) {
+              var entry = drop.trail[t];
+              var alpha = TAIL_ALPHAS[t + 1] || 0.001;
+              ctx.fillStyle = 'rgba(0,229,255,' + alpha + ')';
+              ctx.fillText(entry.ch, x, entry.row * fontSize);
+            }
+
+            /* draw head */
+            ctx.fillStyle = 'rgba(0,229,255,0.42)';
+            ctx.fillText(drop.headCh, x, drop.headRow * fontSize);
+
+            return drop.headRow * fontSize <= h + fontSize * 2;
+          });
         }
-        ctx.shadowBlur = 6;
 
-        ctx.strokeStyle = 'rgba(0,200,80,0.12)';
-        ctx.lineWidth = 1;
-        ctx.shadowBlur = 0;
-        ctx.beginPath();
-        ctx.arc(m.x, m.y, cursorR, 0, Math.PI * 2);
-        ctx.stroke();
-        ctx.shadowBlur = 0;
+        /* ── overlay: green cursor zone ── */
+        ovCtx.clearRect(0, 0, ov.width, ov.height);
+        ovCtx.font = fontSize + 'px "Share Tech Mono", monospace';
 
+        for (var i = 0; i < cols; i++) {
+          var headX = i * fontSize;
+          if (Math.abs(m.x - headX) > cursorR) continue;
+
+          for (var d = 0; d < columns[i].length; d++) {
+            var drop = columns[i][d];
+
+            /* green head */
+            var hy = drop.headRow * fontSize;
+            var dm = Math.sqrt((m.x - headX) * (m.x - headX) + (m.y - hy) * (m.y - hy));
+            if (dm < cursorR) {
+              var prox = 1 - dm / cursorR;
+              ovCtx.fillStyle = 'rgba(0,255,100,' + (prox * 0.95) + ')';
+              ovCtx.shadowColor = 'rgba(0,255,80,0.5)';
+              ovCtx.shadowBlur = 10;
+              ovCtx.fillText(drop.headCh, headX, hy);
+            }
+
+            /* green trail */
+            ovCtx.shadowBlur = 2;
+            for (var t = 0; t < drop.trail.length; t++) {
+              var entry2 = drop.trail[t];
+              var ty = entry2.row * fontSize;
+              var dm2 = Math.sqrt((m.x - headX) * (m.x - headX) + (m.y - ty) * (m.y - ty));
+              if (dm2 >= cursorR) continue;
+              var prox2 = 1 - dm2 / cursorR;
+              var tAlpha = TAIL_ALPHAS[t + 1] || 0.001;
+              ovCtx.fillStyle = 'rgba(0,255,100,' + (prox2 * tAlpha * 3.5) + ')';
+              ovCtx.fillText(entry2.ch, headX, ty);
+            }
+          }
+        }
+
+        /* cursor ring */
+        ovCtx.shadowBlur = 0;
+        ovCtx.save();
+        ovCtx.strokeStyle = 'rgba(0,200,80,0.45)';
+        ovCtx.lineWidth = 1;
+        ovCtx.shadowColor = 'rgba(0,255,80,0.5)';
+        ovCtx.shadowBlur = 10;
+        ovCtx.beginPath();
+        ovCtx.arc(m.x, m.y, cursorR, 0, Math.PI * 2);
+        ovCtx.stroke();
+        ovCtx.restore();
       }
+
       CanvasEngine.register({ canvas, ctx, draw });
     })();
 
