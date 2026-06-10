@@ -614,7 +614,7 @@
     }
 
     .scroll-bracket {
-      width: 120px;
+      width: 200px;
     }
 
     .scroll-svg {
@@ -625,15 +625,15 @@
 
     /* Drip effect on bracket paths via stroke-dasharray animation */
     .scroll-path {
-      stroke-dasharray: 200;
-      stroke-dashoffset: 200;
+      stroke-dasharray: 160;
+      stroke-dashoffset: 160;
       animation: scroll-dash 2s 2.2s ease-in-out infinite;
       filter: drop-shadow(0 0 4px rgba(0, 229, 255, 0.7));
     }
 
     @keyframes scroll-dash {
       0% {
-        stroke-dashoffset: 200;
+        stroke-dashoffset: 160;
         opacity: 0;
       }
 
@@ -708,7 +708,9 @@
       padding: 0.65rem 1rem;
       border: 1px solid var(--border-bright);
       border-bottom: none;
-      background: rgba(0, 229, 255, 0.04);
+      background: rgba(3, 7, 15, 0.82);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -919,7 +921,9 @@
       padding: 0.5rem 1rem;
       border: 1px solid var(--border-bright);
       border-top: 1px solid rgba(0, 229, 255, 0.1);
-      background: rgba(0, 229, 255, 0.03);
+      background: rgba(3, 7, 15, 0.82);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
     }
 
     .char-status-dot {
@@ -958,6 +962,133 @@
     .char-play-btn:hover {
       background: #fff;
       box-shadow: 0 0 20px rgba(0, 229, 255, 0.5);
+    }
+
+    /* ── DEPLOY TERMINAL OVERLAY ── */
+    #deploy-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.96);
+      z-index: 99999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    #deploy-overlay.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .deploy-terminal {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.88rem;
+      color: #00e5ff;
+      width: min(600px, 90vw);
+      padding: 2rem 2.5rem;
+      border: 1px solid rgba(0, 229, 255, 0.3);
+      background: rgba(3, 7, 15, 0.98);
+      box-shadow: 0 0 60px rgba(0, 229, 255, 0.15), inset 0 0 40px rgba(0, 229, 255, 0.03);
+      position: relative;
+    }
+
+    .deploy-terminal::before {
+      content: '[ TERMINAL v2.4 ]';
+      position: absolute;
+      top: -0.6rem;
+      left: 1.5rem;
+      background: #03070f;
+      padding: 0 0.5rem;
+      font-size: 0.7rem;
+      color: rgba(0, 229, 255, 0.5);
+      letter-spacing: 0.15em;
+    }
+
+    .deploy-line {
+      line-height: 1.9;
+      opacity: 0;
+      transform: translateY(4px);
+      transition: opacity 0.15s ease, transform 0.15s ease;
+      white-space: pre;
+    }
+
+    .deploy-line.visible {
+      opacity: 1;
+      transform: none;
+    }
+
+    .deploy-line .prompt {
+      color: rgba(0, 229, 255, 0.45);
+    }
+
+    .deploy-line .ok {
+      color: #00ff88;
+    }
+
+    .deploy-line .warn {
+      color: #ffaa00;
+    }
+
+    .deploy-line .hi {
+      color: #ffffff;
+    }
+
+    .deploy-cursor {
+      display: inline-block;
+      width: 8px;
+      height: 1em;
+      background: #00e5ff;
+      vertical-align: middle;
+      margin-left: 2px;
+      animation: blink-cursor 0.7s step-end infinite;
+    }
+
+    @keyframes blink-cursor {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0;
+      }
+    }
+
+    /* ── RADAR PING ── */
+    #radar-ping {
+      position: fixed;
+      border-radius: 50%;
+      border: 2px solid rgba(0, 229, 255, 0.9);
+      box-shadow: 0 0 20px rgba(0, 229, 255, 0.6), inset 0 0 20px rgba(0, 229, 255, 0.1);
+      pointer-events: none;
+      z-index: 99998;
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0);
+      transition: none;
+    }
+
+    #radar-ping.ping-active {
+      animation: radar-expand 0.9s cubic-bezier(0.2, 0.8, 0.4, 1) forwards;
+    }
+
+    @keyframes radar-expand {
+      0% {
+        opacity: 0.9;
+        transform: translate(-50%, -50%) scale(0);
+      }
+
+      60% {
+        opacity: 0.4;
+      }
+
+      100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(1);
+      }
     }
 
     @media (max-width: 960px) {
@@ -1080,6 +1211,9 @@
       color: #fff;
       text-transform: uppercase;
       letter-spacing: 0.06em;
+      line-height: 1.15;
+      background: none;
+      -webkit-text-fill-color: unset;
     }
 
     .section-title .accent {
@@ -1385,6 +1519,7 @@
       border-bottom: 1px solid var(--border);
       display: block;
       position: relative;
+      background: #030810;
     }
 
     #projectsCanvas {
@@ -1394,6 +1529,144 @@
       height: 100%;
       pointer-events: none;
       z-index: 0;
+    }
+
+    /* ── HEX INTERACTION HINT ── */
+    /* ── HEX PULSE HINT ── */
+    #hex-hint {
+      position: absolute;
+      top: 0;
+      left: 0;
+      transform: translateX(-50%);
+      z-index: 5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      pointer-events: all;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.7s ease;
+    }
+
+    #hex-hint.visible {
+      opacity: 1;
+    }
+
+    #hex-hint.hide {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* projects content hidden until click */
+    #projects .section-wrapper {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+      pointer-events: none;
+    }
+
+    #projects.unlocked .section-wrapper {
+      opacity: 1;
+      transform: none;
+      pointer-events: all;
+    }
+
+    #hex-hint-svg {
+      overflow: visible;
+    }
+
+    /* Core hexagon — draws itself via dashoffset */
+    .hex-ring {
+      fill: none;
+      stroke: rgba(0, 229, 255, 0.9);
+      stroke-width: 1.5;
+      filter: drop-shadow(0 0 6px rgba(0, 229, 255, 0.8));
+      stroke-dasharray: 204;
+      stroke-dashoffset: 204;
+      animation: hex-draw 1.2s 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+
+    @keyframes hex-draw {
+      to {
+        stroke-dashoffset: 0;
+      }
+    }
+
+    /* Outgoing rays — each delayed, stroke-dasharray animates from center outward */
+    .hex-ray {
+      stroke: rgba(0, 229, 255, 0.7);
+      stroke-width: 1.2;
+      stroke-linecap: round;
+      fill: none;
+      filter: drop-shadow(0 0 4px rgba(0, 229, 255, 0.6));
+    }
+
+    /* Label — Knight Rider scanner */
+    .hex-hint-label {
+      font-family: 'Orbitron', monospace;
+      font-size: 0.88rem;
+      font-weight: 700;
+      letter-spacing: 0.35em;
+      color: transparent;
+      position: relative;
+      overflow: hidden;
+      opacity: 0;
+      transition: opacity 0.6s ease;
+      /* base text always faintly visible */
+      -webkit-text-stroke: 1px rgba(0, 229, 255, 0.18);
+      text-shadow:
+        0 0 12px rgba(0, 229, 255, 0.08);
+    }
+
+    #hex-hint.visible .hex-hint-label {
+      opacity: 1;
+      animation: none;
+    }
+
+    /* the scanner light — a pseudo element that sweeps left↔right */
+    .hex-hint-label::before {
+      content: attr(data-text);
+      position: absolute;
+      inset: 0;
+      /* gradient window that moves: bright center, dark edges */
+      background: linear-gradient(90deg,
+          transparent 0%,
+          rgba(0, 229, 255, 0.0) 20%,
+          rgba(0, 229, 255, 0.9) 50%,
+          rgba(0, 229, 255, 0.0) 80%,
+          transparent 100%);
+      background-size: 60% 100%;
+      background-repeat: no-repeat;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      -webkit-text-stroke: 0px;
+      animation: scanner-sweep 2.4s ease-in-out infinite;
+      text-shadow: none;
+    }
+
+    /* dim base text that's always there underneath */
+    .hex-hint-label::after {
+      content: attr(data-text);
+      position: absolute;
+      inset: 0;
+      color: rgba(0, 229, 255, 0.22);
+      -webkit-text-stroke: 0px;
+      text-shadow: 0 0 8px rgba(0, 229, 255, 0.15);
+    }
+
+    @keyframes scanner-sweep {
+      0% {
+        background-position: -60% 0;
+      }
+
+      50% {
+        background-position: 160% 0;
+      }
+
+      100% {
+        background-position: -60% 0;
+      }
     }
 
     .projects-grid {
@@ -1600,7 +1873,7 @@
 
     .dashboard-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      grid-template-columns: repeat(4, 1fr);
       gap: 1rem;
       margin-bottom: 2rem;
     }
@@ -2460,20 +2733,20 @@
 
     <div class="hero-scroll">
       <div class="scroll-bracket">
-        <svg class="scroll-svg" viewBox="0 0 120 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg class="scroll-svg" viewBox="0 0 200 110" fill="none" xmlns="http://www.w3.org/2000/svg">
           <!-- U-shaped bracket -->
-          <path class="scroll-path" d="M10 0 L10 50 Q10 60 20 60 L50 60 L50 68" stroke="rgba(0,229,255,0.5)"
+          <path class="scroll-path" d="M10 25 L10 55 Q10 65 20 65 L90 65 L90 73" stroke="rgba(0,229,255,0.5)"
             stroke-width="1.5" fill="none" />
-          <path class="scroll-path" d="M110 0 L110 50 Q110 60 100 60 L70 60 L70 68" stroke="rgba(0,229,255,0.5)"
+          <path class="scroll-path" d="M190 25 L190 55 Q190 65 180 65 L110 65 L110 73" stroke="rgba(0,229,255,0.5)"
             stroke-width="1.5" fill="none" />
           <!-- SCROLL label between the two bracket legs, above arrows -->
-          <text x="60" y="78" text-anchor="middle" font-family="'Share Tech Mono', monospace" font-size="7"
+          <text x="100" y="83" text-anchor="middle" font-family="'Share Tech Mono', monospace" font-size="13"
             fill="rgba(0,229,255,0.5)" letter-spacing="3">SCROLL</text>
           <!-- Arrow left -->
-          <path class="scroll-arrow-l" d="M42 88 L50 100 L58 88" stroke="rgba(0,229,255,0.8)" stroke-width="1.5"
+          <path class="scroll-arrow-l" d="M82 93 L90 105 L98 93" stroke="rgba(0,229,255,0.8)" stroke-width="1.5"
             fill="none" stroke-linecap="round" stroke-linejoin="round" />
           <!-- Arrow right -->
-          <path class="scroll-arrow-r" d="M62 88 L70 100 L78 88" stroke="rgba(0,229,255,0.8)" stroke-width="1.5"
+          <path class="scroll-arrow-r" d="M102 93 L110 105 L118 93" stroke="rgba(0,229,255,0.8)" stroke-width="1.5"
             fill="none" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
       </div>
@@ -2512,15 +2785,15 @@
             Benutzerführung</strong> bewusst zusammengeführt werden.
         </p>
       </div>
-      <div class="identity-cards reveal-right">
-        <div class="id-card">
+      <div class="identity-cards">
+        <div class="id-card reveal-right" style="transition-delay:0s">
           <div class="id-icon">📍</div>
           <div>
             <div class="id-label">STANDORT</div>
             <div class="id-value">Hamburg, Deutschland</div>
           </div>
         </div>
-        <div class="id-card">
+        <div class="id-card reveal-right" style="transition-delay:0.1s">
           <div class="id-icon">🎓</div>
           <div>
             <div class="id-label">AUSBILDUNG</div>
@@ -2528,39 +2801,39 @@
             <div class="id-value">Fachinformatiker Anwendungsentwicklung</div>
           </div>
         </div>
-        <div class="id-card">
+        <div class="id-card reveal-right" style="transition-delay:0.2s">
           <div class="id-icon">🎵</div>
           <div>
             <div class="id-label">HOBBY / PASSION</div>
             <div class="id-value">Musikproduktion · Visualisierungen · Bouldern</div>
           </div>
         </div>
-        <div class="id-card">
+        <div class="id-card reveal-right" style="transition-delay:0.3s">
           <div class="id-icon">🤖</div>
           <div>
             <div class="id-label">BACKGROUND</div>
             <div class="id-value">Mechatronik · CAD · Robotik · Sensorik</div>
           </div>
         </div>
-        <div class="id-card">
+        <div class="id-card reveal-right" style="transition-delay:0.4s">
           <div class="id-icon">✏️</div>
           <div>
             <div class="id-label">KREATIV</div>
             <div class="id-value">Illustration · Grafikdesign · Motion</div>
           </div>
         </div>
-        <div class="id-card">
+        <div class="id-card reveal-right" style="transition-delay:0.5s">
           <div class="id-icon">🧠</div>
           <div>
             <div class="id-label">PROBLEMLÖSUNG</div>
             <div class="id-value">Analytisches Outside-the-Box-Denken</div>
           </div>
         </div>
-        <div class="id-card">
+        <div class="id-card reveal-right" style="transition-delay:0.6s">
           <div class="id-icon">🎯</div>
           <div>
             <div class="id-label">ZIEL</div>
-            <div class="id-value">Frontend / Web Development</div>
+            <div class="id-value">HMI · Embedded Interfaces · Frontend · Webdevelopment</div>
           </div>
         </div>
       </div>
@@ -2587,6 +2860,11 @@
   <!-- PROJECTS -->
   <section id="projects">
     <canvas id="projectsCanvas"></canvas>
+
+    <!-- HEX PULSE HINT LABEL -->
+    <div id="hex-hint">
+      <div class="hex-hint-label" data-text="CLICK BACKGROUND">CLICK BACKGROUND</div>
+    </div>
 
     <div class="section-wrapper">
       <div class="section-header reveal">
@@ -2623,14 +2901,11 @@
             </div>
 
             <div class="project-details">
-              <span>Raspberry Pi 4</span>
-              <span>Python</span>
-              <span>Sensorik</span>
-              <span>Camera Control</span>
+              <span>Raspberry pi 4 / Python / SQL / Sensorik</span>
             </div>
 
             <div class="project-tags">
-              <span class="tag">Python</span>
+              <span class="tag">Realtime</span>
               <span class="tag">IoT</span>
               <span class="tag">Robotics</span>
             </div>
@@ -2638,7 +2913,7 @@
         </div>
 
         <div class="project-card reveal">
-          <div class="project-status status-live">lEARNING APP</div>
+          <div class="project-status status-live">LEARNING APP</div>
 
           <div class="project-media">
             <img src="Bitwiser_App.png" alt="Bitwiser App – Hex & Binär Lernapp"
@@ -2658,14 +2933,11 @@
             </div>
 
             <div class="project-details">
-              <span>Python</span>
-              <span>Tkinter</span>
-              <span>UI Design</span>
-              <span>Education Tool</span>
+              <span>Python / TKinter / Desktop App</span>
             </div>
 
             <div class="project-tags">
-              <span class="tag">Python</span>
+              <span class="tag">Bitoperationen</span>
               <span class="tag">Education</span>
               <span class="tag">UI</span>
             </div>
@@ -2673,49 +2945,46 @@
         </div>
 
         <div class="project-card reveal">
-          <div class="project-status status-live">ACTIVE DEV</div>
+          <div class="project-status status-live">COMPLETED</div>
 
           <div class="project-media">
-            <div class="project-media-placeholder small">
-              NETBOX PLUGIN<br>FORM BUILDER
-            </div>
+            <img src="netbox.png" alt="NetBox Plugin – Formular Editor"
+              style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top left;display:block;filter:contrast(1.05) brightness(0.90);">
           </div>
 
           <div class="project-meta">
             <div class="project-num">PROJECT_03</div>
-            <div class="project-title">Netbox Formular Editor</div>
+            <div class="project-title">Netbox Formular System</div>
 
             <div class="project-desc">
-              Erweiterbares Plugin-System für Netbox zur dynamischen Erstellung und Verwaltung strukturierter Formulare.
-
-              Implementiert eine direkte Objektbindung zwischen Formularfeldern und Datenmodell sowie eine modulare
-              Field-Architektur zur flexiblen Erweiterung komplexer Datenerfassungsprozesse.
-
-              Fokus liegt auf Systemintegration, Datenkonsistenz und wiederverwendbaren Formular-Templates.
+              NetBox-Plugin zum Aufbau und Betrieb strukturierter
+              Formular-Workflows — komplett per Drag & Drop, ohne technisches Vorwissen.NetBox-Plugin zum Aufbau und
+              Betrieb strukturierter Formular-Workflows — komplett per Drag & Drop, ohne technisches Vorwissen.
+              Das System umfasst ein eigenständiges Changelog, das lückenlos aufzeichnet wer wann welches Feld verändert
+              hat und was durch was ersetzt wurde. Formulare können ausgefüllt, versioniert und über eine
+              Git-Diff-ähnliche Vergleichsansicht gegenübergestellt werden — einzeln oder zwischen mehreren Objekten.
+              Renewal Policies steuern intervallbasierte Wiedervorlagen inklusive Warn-Widget. Ein Customer Portal
+              ermöglicht die direkte Weitergabe von Formularen an Kunden zur eigenständigen Befüllung.
             </div>
 
             <div class="project-details">
-              <span>Python</span>
-              <span>Django</span>
-              <span>Netbox</span>
-              <span>Plugin System</span>
+              <span>Python / Django / HTML / CSS / JavaScript</span>
             </div>
 
             <div class="project-tags">
-              <span class="tag">Backend</span>
-              <span class="tag">Django</span>
-              <span class="tag">System Integration</span>
+              <span class="tag">NetBox</span>
+              <span class="tag">Drag & Drop</span>
+              <span class="tag">Workflow</span>
             </div>
           </div>
         </div>
 
         <div class="project-card reveal">
-          <div class="project-status status-soon">CONCEPT</div>
+          <div class="project-status status-live">LIVE</div>
 
           <div class="project-media">
-            <div class="project-media-placeholder small">
-              THIS PORTFOLIO<br>NEXT GENERATION UI
-            </div>
+            <img src="portfolio.png" alt="Portfolio Website DKG.dev"
+              style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top center;display:block;filter:contrast(1.05) brightness(0.90);">
           </div>
 
           <div class="project-meta">
@@ -2723,25 +2992,22 @@
             <div class="project-title">Portfolio System v2</div>
 
             <div class="project-desc">
-              Experimentelles UI-System für eine nächste Generation von Web-Portfolios.
-
-              Fokus auf Canvas-basierte Animationen, scrollgetriggerte Transitionen und modulare Section-Architektur
-              zur dynamischen Inhaltsdarstellung.
-
-              Ziel ist ein interaktives, visuell getriebenes Interface mit potenzieller WebGL-Erweiterung.
+              Vollständig in HTML, CSS und JavaScript entwickeltes Portfolio — kein Framework, keine externe
+              Bibliothek.
+              Interaktive Canvas-Animationen, scrollgetriggerte Transitionen und eine modulare Section-Architektur
+              bilden das technische Fundament. Jede visuelle Komponente — vom Hex-Grid-Entry über den Radar-Scanner bis
+              zum Matrix-Terminal — ist von Grund auf selbst implementiert.
+              Das Ergebnis ist diese Seite.
             </div>
 
             <div class="project-details">
-              <span>HTML</span>
-              <span>CSS</span>
-              <span>JavaScript</span>
-              <span>Canvas</span>
+              <span>HTML / CSS / JavaScript / ♥ Love</span>
             </div>
 
             <div class="project-tags">
               <span class="tag">Frontend</span>
               <span class="tag">UX</span>
-              <span class="tag">WebGL (planned)</span>
+              <span class="tag">Procedural Animation</span>
             </div>
           </div>
         </div>
@@ -2788,7 +3054,7 @@
           <span class="passion-icon">🎛️</span>
           <div class="passion-title">Musik & Sound</div>
           <p class="passion-desc">20 Jahre Musikproduktion. Ich höre Musik nicht nur –
-            ich erschaffe sie komplett selbst, bringe sie auf Festivalbühnen
+            ich erschaffe sie komplett selbst, brachte sie auf Festivalbühnen
             und verwandle sie in soundreaktive Visuals, die jeden Beat sichtbar machen.</p>
         </div>
         <div class="passion-card reveal">
@@ -2819,6 +3085,11 @@
       <div class="section-header reveal">
         <div class="section-tag">// 005 · LIVE TERMINAL</div>
         <h2 class="section-title">SIE WERDEN<br><span class="accent">GESEHEN</span></h2>
+        <p class="disclaimer"
+          style="font-size:0.78rem;text-align:left;margin-top:1rem;color:var(--text-muted);background:rgba(3,8,16,0.92);border:2px solid rgba(0,229,255,0.25);padding:0.6rem 0.75rem;border-radius:2px;">
+          // Reine Demonstration technischer Möglichkeiten ·<br>
+          Diese Daten sind für jeden Server öffentlich sichtbar und werden nicht gespeichert.
+        </p>
       </div>
       <div class="reveal">
         <div class="geo-map">
@@ -2864,9 +3135,7 @@
             <div class="dash-value" id="dashTime">--:--:--</div>
           </div>
         </div>
-        <p class="disclaimer">// Nur zur
-          Demonstration der technischen Möglichkeiten · Diese Daten sind öffentlich zugänglich und werden nicht
-          gespeichert</p>
+
       </div>
     </div>
   </section>
@@ -3497,11 +3766,43 @@
       }
 
       let clickPulses = [];
+      let hexHintDismissed = false;
+
+      // ── Entry pulses: inward waves (outside→in) spawned on section entry ──
+      let entryPulses = [];
+      let entryFrame = 0;
+      const ENTRY_SPEED = 0.007;  // slower, more dramatic
+      const ENTRY_INTERVAL = 90;     // new wave every ~1.5s
+
+      const hint = document.getElementById('hex-hint');
+      let entryStarted = false;
+
+      const section = document.getElementById('projects');
+      new IntersectionObserver(entries => {
+        if (entries[0].isIntersecting && !hexHintDismissed && !entryStarted) {
+          entryStarted = true;
+          if (hint) hint.classList.add('visible');
+          entryFrame = 1;
+          entryPulses.push({ t: 0 }); // first wave immediately
+        }
+      }, { threshold: 0.15 }).observe(section);
 
       canvas.parentElement.addEventListener('click', e => {
         const r = canvas.parentElement.getBoundingClientRect();
         const cx = e.clientX - r.left, cy = e.clientY - r.top;
         clickPulses.push({ x: cx, y: cy, t: 0 });
+
+        if (!hexHintDismissed) {
+          hexHintDismissed = true;
+          entryPulses = [];
+          if (hint) hint.classList.add('hide');
+          setTimeout(() => {
+            section.classList.add('unlocked');
+            section.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach((el, i) => {
+              setTimeout(() => el.classList.add('visible'), i * 120);
+            });
+          }, 400);
+        }
       });
 
       function draw() {
@@ -3517,54 +3818,79 @@
         clickPulses = clickPulses.filter(p => p.t < 1);
         clickPulses.forEach(p => p.t += 0.012);
 
-        hexes.forEach(hex => {
-          // cursor proximity glow
-          const dx = m.x - hex.x, dy = m.y - hex.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          const targetGlow = dist < 220 ? Math.pow(1 - dist / 220, 1.8) : 0;
-          hex.glow += (targetGlow - hex.glow) * 0.1;
+        // ── entry pulses: spawn only after text fade-in ──
+        if (!hexHintDismissed && entryFrame > 0) {
+          entryFrame++;
+          if (entryFrame % ENTRY_INTERVAL === 1) entryPulses.push({ t: 0 });
+        }
+        entryPulses = entryPulses.filter(p => p.t < 1);
+        entryPulses.forEach(p => p.t += ENTRY_SPEED);
 
-          // click pulse waves
+        hexes.forEach(hex => {
+          // cursor proximity glow — only after click
+          if (hexHintDismissed) {
+            const dx = m.x - hex.x, dy = m.y - hex.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            const targetGlow = dist < 220 ? Math.pow(1 - dist / 220, 1.8) : 0;
+            hex.glow += (targetGlow - hex.glow) * 0.1;
+          } else {
+            hex.glow *= 0.95;
+          }
+
+          // click pulse (outward)
           let pulseVal = 0;
           clickPulses.forEach(p => {
             const pd = Math.sqrt((p.x - hex.x) ** 2 + (p.y - hex.y) ** 2);
             const waveFront = p.t * 900;
             const delta = Math.abs(pd - waveFront);
-            if (delta < 55) {
-              pulseVal = Math.max(pulseVal, (1 - delta / 55) * (1 - p.t));
-            }
+            if (delta < 55) pulseVal = Math.max(pulseVal, (1 - delta / 55) * (1 - p.t));
+          });
+
+          // entry pulse (inward) — stroke + dot
+          // Center = middle of the first visible viewport within the 200vh section
+          const MAX_R = Math.sqrt(w * w + h * h);
+          const cx = w * 0.495;
+          const cy = window.innerHeight * 0.5 + 62;
+          let entryVal = 0;
+          entryPulses.forEach(p => {
+            const waveFront = MAX_R * (1 - p.t);
+            const dist = Math.sqrt((hex.x - cx) ** 2 + (hex.y - cy) ** 2);
+            const delta = Math.abs(dist - waveFront);
+            if (delta < 55) entryVal = Math.max(entryVal, (1 - delta / 55) * (1 - p.t * 0.5));
           });
 
           const g = Math.max(hex.glow, pulseVal);
-          const edgeAlpha = 0.035 + g * 0.55;
-          const fillAlpha = g * 0.09;
+          const gCombined = Math.max(g, entryVal);
 
           drawHex(hex.x, hex.y, HEX_R - 1.5);
 
-          if (fillAlpha > 0.004) {
-            ctx.fillStyle = `rgba(0,229,255,${fillAlpha})`;
+          if (g * 0.09 > 0.004) {
+            ctx.fillStyle = `rgba(0,229,255,${(g * 0.09).toFixed(3)})`;
             ctx.fill();
           }
 
-          ctx.strokeStyle = `rgba(0,229,255,${edgeAlpha})`;
-          ctx.lineWidth = 0.5 + g * 1.2;
+          // stroke: driven by click/cursor glow OR entry wave
+          ctx.strokeStyle = `rgba(0,229,255,${(0.035 + gCombined * 0.55).toFixed(3)})`;
+          ctx.lineWidth = 0.5 + gCombined * 1.5;
           ctx.stroke();
 
-          // inner accent dot for high-glow hexes
-          if (g > 0.5) {
+          // center dot — visible from cursor/click glow OR entry wave
+          if (gCombined > 0.3) {
             ctx.beginPath();
-            ctx.arc(hex.x, hex.y, 2 + g * 3, 0, Math.PI * 2);
-            ctx.fillStyle = `rgba(0,229,255,${g * 0.35})`;
+            ctx.arc(hex.x, hex.y, 2 + gCombined * 3, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(0,229,255,${(gCombined * 0.40).toFixed(3)})`;
             ctx.fill();
           }
         });
 
-        // soft radial vignette around cursor
-        const gr = ctx.createRadialGradient(m.x, m.y, 0, m.x, m.y, 260);
-        gr.addColorStop(0, 'rgba(0,229,255,0.05)');
-        gr.addColorStop(1, 'transparent');
-        ctx.fillStyle = gr;
-        ctx.fillRect(0, 0, w, h);
+        // cursor vignette — only after click
+        if (hexHintDismissed) {
+          const gr = ctx.createRadialGradient(m.x, m.y, 0, m.x, m.y, 260);
+          gr.addColorStop(0, 'rgba(0,229,255,0.05)');
+          gr.addColorStop(1, 'transparent');
+          ctx.fillStyle = gr;
+          ctx.fillRect(0, 0, w, h);
+        }
       }
 
       CanvasEngine.register({ canvas, ctx, draw });
@@ -4244,6 +4570,172 @@
     })();
 
     CanvasEngine.start();
+  </script>
+
+  <!-- DEPLOY TERMINAL OVERLAY -->
+  <div id="deploy-overlay">
+    <div class="deploy-terminal" id="deploy-terminal-box"></div>
+  </div>
+
+  <!-- RADAR PING ELEMENT -->
+  <div id="radar-ping"></div>
+
+  <script>
+    /* ── HEX PULSE HINT RAYS ── */
+    (function () {
+      const hint = document.getElementById('hex-hint');
+      if (!hint) return;
+
+      const rays = [
+        { id: 'hr0', sx: 0, sy: -34, dx: 0, dy: -1 },
+        { id: 'hr1', sx: 29.44, sy: -17, dx: 0.866, dy: -0.5 },
+        { id: 'hr2', sx: 29.44, sy: 17, dx: 0.866, dy: 0.5 },
+        { id: 'hr3', sx: 0, sy: 34, dx: 0, dy: 1 },
+        { id: 'hr4', sx: -29.44, sy: 17, dx: -0.866, dy: 0.5 },
+        { id: 'hr5', sx: -29.44, sy: -17, dx: -0.866, dy: -0.5 },
+      ];
+
+      const RAY_LEN = 52;
+      const CYCLE = 2200;
+      const STAGGER = 60;
+
+      let startTime = null;
+      let rafId = null;
+      let dismissed = false;
+
+      function easeInOut(t) {
+        return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+      }
+
+      function animateRays(ts) {
+        if (!startTime) startTime = ts;
+        const elapsed = ts - startTime;
+
+        rays.forEach((ray, i) => {
+          const el = document.getElementById(ray.id);
+          if (!el) return;
+          const offset = i * STAGGER;
+          const raw = elapsed - offset;
+          if (raw < 0) return;
+          const t = (raw % CYCLE) / CYCLE;
+          let progress, alpha;
+          if (t < 0.5) {
+            progress = easeInOut(t * 2);
+            alpha = 0.15 + progress * 0.7;
+          } else {
+            progress = 1 - easeInOut((t - 0.5) * 2);
+            alpha = progress * 0.55;
+          }
+          const len = progress * RAY_LEN;
+          el.setAttribute('x2', ray.sx + ray.dx * len);
+          el.setAttribute('y2', ray.sy + ray.dy * len);
+          el.setAttribute('stroke', 'rgba(0,229,255,' + alpha.toFixed(3) + ')');
+        });
+
+        if (!dismissed) rafId = requestAnimationFrame(animateRays);
+      }
+
+      const section = document.getElementById('projects');
+      const observer = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          if (e.isIntersecting && !dismissed) {
+            startTime = null;
+            rafId = requestAnimationFrame(animateRays);
+          } else {
+            if (rafId) cancelAnimationFrame(rafId);
+          }
+        });
+      }, { threshold: 0.15 });
+
+      if (section) observer.observe(section);
+
+      // Snap hint to exact hex-grid cell that's visible when section loads
+      function positionHintOnLamp() {
+        const secW = section.offsetWidth;
+        const lampX = secW * 0.5;
+        const lampY = window.innerHeight * 0.5 + 67;
+        hint.style.left = lampX + 'px';
+        hint.style.top = lampY + 'px';
+        hint.style.transform = 'translateX(-50%)';
+      }
+
+      positionHintOnLamp();
+      window.addEventListener('resize', positionHintOnLamp);
+    })();
+
+    /* ── DEPLOY TERMINAL + RADAR PING ── */
+    (function () {
+      const btn = document.querySelector('.char-play-btn');
+      if (!btn) return;
+
+      const overlay = document.getElementById('deploy-overlay');
+      const terminal = document.getElementById('deploy-terminal-box');
+      const ping = document.getElementById('radar-ping');
+
+      const lines = [
+        [0, '<span class="prompt">&gt; </span><span class="hi">DEPLOYING DUSTIN_GROSS...</span>'],
+        [280, '<span class="prompt">&gt; </span>Initializing skill matrix...........  <span class="ok">[OK]</span>'],
+        [520, '<span class="prompt">&gt; </span>Loading asset: <span class="warn">Profilbild.png</span>....  <span class="ok">[OK]</span>'],
+        [760, '<span class="prompt">&gt; </span>Compiling Python modules..............  <span class="ok">[OK]</span>'],
+        [1000, '<span class="prompt">&gt; </span>Patching CSS bugs......................  <span class="warn">[1 WARN]</span>'],
+        [1220, '<span class="prompt">&gt; </span>Connecting to Hamburg.DE...............  <span class="ok">[OK]</span>'],
+        [1460, '<span class="prompt">&gt; </span>EXP bar: <span class="warn">████████████░░░░</span>  82% — still grinding'],
+        [1700, '<span class="prompt">&gt; </span><span class="hi">Character ready. Launching portfolio...</span> <span class="deploy-cursor"></span>'],
+      ];
+
+      function getPingSize() {
+        return Math.ceil(Math.sqrt(window.innerWidth ** 2 + window.innerHeight ** 2) * 2);
+      }
+
+      function launchPingThenScroll(originX, originY) {
+        const size = getPingSize();
+        ping.style.width = size + 'px';
+        ping.style.height = size + 'px';
+        ping.style.left = originX + 'px';
+        ping.style.top = originY + 'px';
+        ping.style.opacity = '0';
+        ping.style.transform = 'translate(-50%, -50%) scale(0)';
+        ping.classList.remove('ping-active');
+        void ping.offsetWidth;
+        ping.classList.add('ping-active');
+        setTimeout(() => {
+          ping.classList.remove('ping-active');
+          document.querySelector('#about')?.scrollIntoView({ behavior: 'smooth' });
+        }, 880);
+      }
+
+      btn.addEventListener('click', function (e) {
+        e.preventDefault();
+        const rect = btn.getBoundingClientRect();
+        const originX = rect.left + rect.width / 2;
+        const originY = rect.top + rect.height / 2;
+
+        terminal.innerHTML = '';
+        overlay.classList.add('active');
+
+        lines.forEach(([delay, html]) => {
+          setTimeout(() => {
+            const div = document.createElement('div');
+            div.className = 'deploy-line';
+            div.innerHTML = html;
+            terminal.appendChild(div);
+            requestAnimationFrame(() => requestAnimationFrame(() => div.classList.add('visible')));
+          }, delay);
+        });
+
+        const lastDelay = lines[lines.length - 1][0];
+        setTimeout(() => {
+          overlay.style.transition = 'opacity 0.4s ease';
+          overlay.style.opacity = '0';
+          setTimeout(() => {
+            overlay.classList.remove('active');
+            overlay.style.opacity = '';
+            overlay.style.transition = '';
+            launchPingThenScroll(originX, originY);
+          }, 420);
+        }, lastDelay + 900);
+      });
+    })();
   </script>
 
 </body>
