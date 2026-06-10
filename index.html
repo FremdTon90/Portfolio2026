@@ -150,6 +150,8 @@
       background: rgba(3, 7, 15, 0.85);
       backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border);
+      position: fixed;
+      /* keep fixed */
     }
 
     .nav-logo {
@@ -197,6 +199,44 @@
 
     .nav-links a:hover::before {
       opacity: 1;
+    }
+
+    /* ── NAV ACTIVE INDICATOR ── */
+    .nav-links a.nav-active {
+      color: var(--cyan);
+    }
+
+    .nav-links a.nav-active::before {
+      opacity: 1;
+    }
+
+    .nav-logo.nav-active {
+      text-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
+    }
+
+    #nav-indicator {
+      position: absolute;
+      bottom: -1px;
+      height: 2px;
+      background: var(--cyan);
+      box-shadow: 0 0 8px var(--cyan), 0 0 18px rgba(0, 229, 255, 0.5);
+      transition: left 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+        width 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+        opacity 0.3s;
+      pointer-events: none;
+      border-radius: 1px;
+    }
+
+    #nav-indicator::after {
+      content: '▲';
+      position: absolute;
+      top: -18px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.55rem;
+      color: var(--cyan);
+      text-shadow: 0 0 8px var(--cyan);
+      line-height: 1;
     }
 
     .nav-status {
@@ -1531,8 +1571,7 @@
       z-index: 0;
     }
 
-    /* ── HEX INTERACTION HINT ── */
-    /* ── HEX PULSE HINT ── */
+    /* ── AMPOULE ── */
     #hex-hint {
       position: absolute;
       top: 0;
@@ -1543,7 +1582,7 @@
       flex-direction: column;
       align-items: center;
       pointer-events: all;
-      cursor: pointer;
+      cursor: none;
       opacity: 0;
       transition: opacity 0.7s ease;
     }
@@ -1555,6 +1594,64 @@
     #hex-hint.hide {
       opacity: 0;
       pointer-events: none;
+    }
+
+    #ampoule-svg {
+      filter: drop-shadow(0 0 10px rgba(0, 229, 255, 0.35)) drop-shadow(0 0 25px rgba(0, 229, 255, 0.15));
+      animation: ampoule-float 3.2s ease-in-out infinite;
+      transition: filter 0.3s;
+    }
+
+    #hex-hint:hover #ampoule-svg {
+      filter: drop-shadow(0 0 16px rgba(0, 229, 255, 0.7)) drop-shadow(0 0 40px rgba(0, 229, 255, 0.3));
+    }
+
+    @keyframes ampoule-float {
+
+      0%,
+      100% {
+        transform: translateY(0px) rotate(-2deg);
+      }
+
+      50% {
+        transform: translateY(-8px) rotate(2deg);
+      }
+    }
+
+    @keyframes bubble-rise {
+      0% {
+        transform: translateY(0) scale(1);
+        opacity: 0.6;
+      }
+
+      80% {
+        transform: translateY(-28px) scale(1.2);
+        opacity: 0.4;
+      }
+
+      100% {
+        transform: translateY(-34px) scale(0.5);
+        opacity: 0;
+      }
+    }
+
+    .amp-bubble {
+      animation: bubble-rise 2.8s ease-in infinite;
+    }
+
+    .amp-bubble:nth-child(1) {
+      animation-delay: 0s;
+      animation-duration: 2.6s;
+    }
+
+    .amp-bubble:nth-child(2) {
+      animation-delay: 0.9s;
+      animation-duration: 3.1s;
+    }
+
+    .amp-bubble:nth-child(3) {
+      animation-delay: 1.7s;
+      animation-duration: 2.4s;
     }
 
     /* projects content hidden until click */
@@ -1569,104 +1666,6 @@
       opacity: 1;
       transform: none;
       pointer-events: all;
-    }
-
-    #hex-hint-svg {
-      overflow: visible;
-    }
-
-    /* Core hexagon — draws itself via dashoffset */
-    .hex-ring {
-      fill: none;
-      stroke: rgba(0, 229, 255, 0.9);
-      stroke-width: 1.5;
-      filter: drop-shadow(0 0 6px rgba(0, 229, 255, 0.8));
-      stroke-dasharray: 204;
-      stroke-dashoffset: 204;
-      animation: hex-draw 1.2s 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-    }
-
-    @keyframes hex-draw {
-      to {
-        stroke-dashoffset: 0;
-      }
-    }
-
-    /* Outgoing rays — each delayed, stroke-dasharray animates from center outward */
-    .hex-ray {
-      stroke: rgba(0, 229, 255, 0.7);
-      stroke-width: 1.2;
-      stroke-linecap: round;
-      fill: none;
-      filter: drop-shadow(0 0 4px rgba(0, 229, 255, 0.6));
-    }
-
-    /* Label — Knight Rider scanner */
-    .hex-hint-label {
-      font-family: 'Orbitron', monospace;
-      font-size: 0.88rem;
-      font-weight: 700;
-      letter-spacing: 0.35em;
-      color: transparent;
-      position: relative;
-      overflow: hidden;
-      opacity: 0;
-      transition: opacity 0.6s ease;
-      /* base text always faintly visible */
-      -webkit-text-stroke: 1px rgba(0, 229, 255, 0.18);
-      text-shadow:
-        0 0 12px rgba(0, 229, 255, 0.08);
-    }
-
-    #hex-hint.visible .hex-hint-label {
-      opacity: 1;
-      animation: none;
-    }
-
-    /* the scanner light — a pseudo element that sweeps left↔right */
-    .hex-hint-label::before {
-      content: attr(data-text);
-      position: absolute;
-      inset: 0;
-      /* gradient window that moves: bright center, dark edges */
-      background: linear-gradient(90deg,
-          transparent 0%,
-          rgba(0, 229, 255, 0.0) 20%,
-          rgba(0, 229, 255, 0.9) 50%,
-          rgba(0, 229, 255, 0.0) 80%,
-          transparent 100%);
-      background-size: 60% 100%;
-      background-repeat: no-repeat;
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      -webkit-text-stroke: 0px;
-      animation: scanner-sweep 2.4s ease-in-out infinite;
-      text-shadow: none;
-    }
-
-    /* dim base text that's always there underneath */
-    .hex-hint-label::after {
-      content: attr(data-text);
-      position: absolute;
-      inset: 0;
-      color: rgba(0, 229, 255, 0.22);
-      -webkit-text-stroke: 0px;
-      text-shadow: 0 0 8px rgba(0, 229, 255, 0.15);
-    }
-
-    @keyframes scanner-sweep {
-      0% {
-        background-position: -60% 0;
-      }
-
-      50% {
-        background-position: 160% 0;
-      }
-
-      100% {
-        background-position: -60% 0;
-      }
     }
 
     .projects-grid {
@@ -2614,7 +2613,7 @@
   <nav>
     <a class="nav-logo" href="#hero">DKG<span>.dev</span></a>
 
-    <ul class="nav-links">
+    <ul class="nav-links" id="navLinks">
       <li><a href="#about">ABOUT</a></li>
       <li><a href="#stack">STACK</a></li>
       <li><a href="#projects">PROJEKTE</a></li>
@@ -2623,6 +2622,7 @@
       <li><a href="#story">TIMELINE</a></li>
       <li><a href="#contact">KONTAKT</a></li>
     </ul>
+    <div id="nav-indicator"></div>
 
     <div class="nav-status">
       <div class="status-dot"></div>
@@ -2863,7 +2863,93 @@
 
     <!-- HEX PULSE HINT LABEL -->
     <div id="hex-hint">
-      <div class="hex-hint-label" data-text="CLICK BACKGROUND">CLICK BACKGROUND</div>
+
+      <!-- AMPOULE SVG -->
+      <svg id="ampoule-svg" viewBox="0 0 60 130" xmlns="http://www.w3.org/2000/svg" width="140" height="303">
+        <defs>
+          <clipPath id="liquid-clip">
+            <rect id="liquid-clip-rect" x="14" y="20" width="32" height="80" rx="6" />
+          </clipPath>
+          <linearGradient id="glass-grad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="rgba(0,229,255,0.18)" />
+            <stop offset="40%" stop-color="rgba(0,229,255,0.07)" />
+            <stop offset="70%" stop-color="rgba(0,229,255,0.22)" />
+            <stop offset="100%" stop-color="rgba(0,229,255,0.08)" />
+          </linearGradient>
+          <linearGradient id="liquid-grad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#00e5ff" stop-opacity="0.85" />
+            <stop offset="100%" stop-color="#0077aa" stop-opacity="0.95" />
+          </linearGradient>
+          <filter id="amp-glow" x="-30%" y="-30%" width="160%" height="160%">
+            <feGaussianBlur stdDeviation="2.5" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+          <filter id="liquid-glow" x="-20%" y="-10%" width="140%" height="120%">
+            <feGaussianBlur stdDeviation="3" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        </defs>
+
+        <!-- Sealed tip -->
+        <ellipse cx="30" cy="4" rx="2" ry="1.5" fill="rgba(0,229,255,0.5)" stroke="rgba(0,229,255,0.7)"
+          stroke-width="0.8" filter="url(#amp-glow)" />
+
+        <!-- Thin neck -->
+        <rect x="28.2" y="4" width="3.6" height="8" rx="1.8" fill="rgba(0,229,255,0.12)" stroke="rgba(0,229,255,0.55)"
+          stroke-width="0.9" filter="url(#amp-glow)" />
+
+        <!-- Score ring on neck -->
+        <line x1="27.8" y1="9" x2="32.2" y2="9" stroke="rgba(0,229,255,0.6)" stroke-width="0.7" />
+
+        <!-- Shoulder taper: neck widens into body -->
+        <path d="M28.2 12 Q22 14 18 20" stroke="rgba(0,229,255,0.5)" stroke-width="1.1" fill="none"
+          stroke-linecap="round" />
+        <path d="M31.8 12 Q38 14 42 20" stroke="rgba(0,229,255,0.5)" stroke-width="1.1" fill="none"
+          stroke-linecap="round" />
+        <!-- Shoulder fill (glass) -->
+        <path d="M28.2 12 Q22 14 18 20 L14 20 Q18 13 28.2 12 Z" fill="rgba(0,229,255,0.06)" stroke="none" />
+        <path d="M31.8 12 Q38 14 42 20 L46 20 Q42 13 31.8 12 Z" fill="rgba(0,229,255,0.06)" stroke="none" />
+
+        <!-- Liquid + wave clipped to glass body -->
+        <g clip-path="url(#liquid-clip)">
+          <rect id="ampoule-liquid" x="14" y="45" width="32" height="58" fill="url(#liquid-grad)"
+            filter="url(#liquid-glow)" />
+          <path id="ampoule-wave" d="" fill="rgba(0,229,255,0.6)" filter="url(#liquid-glow)" />
+          <circle class="amp-bubble" cx="22" cy="80" r="2.2" fill="rgba(0,229,255,0.55)" />
+          <circle class="amp-bubble" cx="33" cy="65" r="1.5" fill="rgba(0,229,255,0.4)" />
+          <circle class="amp-bubble" cx="27" cy="90" r="1.8" fill="rgba(0,229,255,0.45)" />
+          <rect x="18" y="46" width="4" height="56" rx="2" fill="rgba(255,255,255,0.08)" />
+        </g>
+
+        <!-- Glass body -->
+        <rect x="14" y="20" width="32" height="80" rx="6" fill="url(#glass-grad)" stroke="rgba(0,229,255,0.55)"
+          stroke-width="1.3" filter="url(#amp-glow)" />
+
+        <!-- Highlight reflection -->
+        <rect x="16" y="24" width="3" height="70" rx="1.5" fill="rgba(255,255,255,0.07)" />
+
+        <!-- Bottom cap -->
+        <path d="M14 96 Q14 106 30 108 Q46 106 46 96" fill="rgba(0,229,255,0.1)" stroke="rgba(0,229,255,0.45)"
+          stroke-width="1.2" />
+
+        <!-- Score line -->
+        <line x1="17" y1="30" x2="43" y2="30" stroke="rgba(0,229,255,0.3)" stroke-width="0.8" stroke-dasharray="3,2" />
+
+        <!-- Label sticker -->
+        <rect x="15" y="52" width="30" height="24" rx="2" fill="rgba(0,0,20,0.65)" stroke="rgba(0,229,255,0.45)"
+          stroke-width="0.8" />
+        <text x="30" y="61" text-anchor="middle" font-family="'Orbitron',monospace" font-size="5.8" font-weight="700"
+          fill="rgba(0,229,255,0.92)" letter-spacing="0.3" filter="url(#amp-glow)">INJECT</text>
+        <text x="30" y="71" text-anchor="middle" font-family="'Orbitron',monospace" font-size="5.8" font-weight="700"
+          fill="rgba(0,229,255,0.92)" letter-spacing="0.3" filter="url(#amp-glow)">ME</text>
+      </svg>
+
     </div>
 
     <div class="section-wrapper">
@@ -4581,67 +4667,72 @@
   <div id="radar-ping"></div>
 
   <script>
-    /* ── HEX PULSE HINT RAYS ── */
+    /* ── AMPOULE WAVE + BUBBLE ANIMATION ── */
     (function () {
       const hint = document.getElementById('hex-hint');
       if (!hint) return;
 
-      const rays = [
-        { id: 'hr0', sx: 0, sy: -34, dx: 0, dy: -1 },
-        { id: 'hr1', sx: 29.44, sy: -17, dx: 0.866, dy: -0.5 },
-        { id: 'hr2', sx: 29.44, sy: 17, dx: 0.866, dy: 0.5 },
-        { id: 'hr3', sx: 0, sy: 34, dx: 0, dy: 1 },
-        { id: 'hr4', sx: -29.44, sy: 17, dx: -0.866, dy: 0.5 },
-        { id: 'hr5', sx: -29.44, sy: -17, dx: -0.866, dy: -0.5 },
-      ];
+      const wave = document.getElementById('ampoule-wave');
+      const liquid = document.getElementById('ampoule-liquid');
+      const bubbles = document.querySelectorAll('.amp-bubble');
 
-      const RAY_LEN = 52;
-      const CYCLE = 2200;
-      const STAGGER = 60;
+      const GLASS_LEFT = 14;
+      const GLASS_RIGHT = 46;
+      const GLASS_W = 32;
+
+      // Bubble start Y positions
+      const bubbleBaseY = [80, 65, 90];
+      bubbles.forEach((b, i) => { b._baseY = bubbleBaseY[i]; b._y = bubbleBaseY[i]; });
 
       let startTime = null;
       let rafId = null;
-      let dismissed = false;
+      let running = false;
 
-      function easeInOut(t) {
-        return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
-      }
-
-      function animateRays(ts) {
+      function animateAmpoule(ts) {
         if (!startTime) startTime = ts;
-        const elapsed = ts - startTime;
+        const t = (ts - startTime) / 1000; // seconds
 
-        rays.forEach((ray, i) => {
-          const el = document.getElementById(ray.id);
-          if (!el) return;
-          const offset = i * STAGGER;
-          const raw = elapsed - offset;
-          if (raw < 0) return;
-          const t = (raw % CYCLE) / CYCLE;
-          let progress, alpha;
-          if (t < 0.5) {
-            progress = easeInOut(t * 2);
-            alpha = 0.15 + progress * 0.7;
-          } else {
-            progress = 1 - easeInOut((t - 0.5) * 2);
-            alpha = progress * 0.55;
+        // ── Wave path on top of liquid ──
+        // Liquid top sits at y=45; wave oscillates around it
+        const waveY = 45;
+        const amp = 1.8;
+        const freq = 1.1;
+        const steps = 12;
+        const stepW = GLASS_W / steps;
+
+        let d = `M ${GLASS_LEFT} ${waveY + amp}`;
+        for (let i = 0; i <= steps; i++) {
+          const x = GLASS_LEFT + i * stepW;
+          const y = waveY + Math.sin(t * freq * Math.PI * 2 + i * 0.9) * amp;
+          d += ` L ${x} ${y}`;
+        }
+        // Close down to fill body
+        d += ` L ${GLASS_RIGHT} 103 L ${GLASS_LEFT} 103 Z`;
+        wave.setAttribute('d', d);
+
+        // ── Bubbles: float upward, reset when they reach wave top ──
+        bubbles.forEach((b, i) => {
+          const speed = [14, 10, 12][i]; // px per second
+          b._y -= speed * (1 / 60);
+          if (b._y < waveY - 2) {
+            b._y = b._baseY + Math.random() * 8;
+            b.setAttribute('cx', (GLASS_LEFT + 6 + Math.random() * (GLASS_W - 12)).toFixed(1));
           }
-          const len = progress * RAY_LEN;
-          el.setAttribute('x2', ray.sx + ray.dx * len);
-          el.setAttribute('y2', ray.sy + ray.dy * len);
-          el.setAttribute('stroke', 'rgba(0,229,255,' + alpha.toFixed(3) + ')');
+          b.setAttribute('cy', b._y.toFixed(1));
         });
 
-        if (!dismissed) rafId = requestAnimationFrame(animateRays);
+        if (running) rafId = requestAnimationFrame(animateAmpoule);
       }
 
       const section = document.getElementById('projects');
       const observer = new IntersectionObserver(entries => {
         entries.forEach(e => {
-          if (e.isIntersecting && !dismissed) {
+          if (e.isIntersecting) {
+            running = true;
             startTime = null;
-            rafId = requestAnimationFrame(animateRays);
+            rafId = requestAnimationFrame(animateAmpoule);
           } else {
+            running = false;
             if (rafId) cancelAnimationFrame(rafId);
           }
         });
@@ -4649,11 +4740,12 @@
 
       if (section) observer.observe(section);
 
-      // Snap hint to exact hex-grid cell that's visible when section loads
+      // Position the hint centered in the section
       function positionHintOnLamp() {
+        if (!section) return;
         const secW = section.offsetWidth;
         const lampX = secW * 0.5;
-        const lampY = window.innerHeight * 0.5 + 67;
+        const lampY = window.innerHeight * 0.5 - 20;
         hint.style.left = lampX + 'px';
         hint.style.top = lampY + 'px';
         hint.style.transform = 'translateX(-50%)';
@@ -4734,6 +4826,75 @@
             launchPingThenScroll(originX, originY);
           }, 420);
         }, lastDelay + 900);
+      });
+    })();
+  </script>
+  <script>
+    /* ── NAV ACTIVE INDICATOR ── */
+    (function () {
+      // 'hero' = logo anchor fallback; rest are nav-links
+      const sections = ['about', 'stack', 'projects', 'passions', 'dashboard', 'story', 'contact'];
+      const navLinks = document.getElementById('navLinks');
+      const indicator = document.getElementById('nav-indicator');
+      const nav = document.querySelector('nav');
+      const logoAnchor = document.querySelector('.nav-logo');
+
+      // Returns the <a> for a section id, or the logo element for 'hero'
+      function getAnchorForSection(id) {
+        if (id === 'hero') return logoAnchor;
+        return navLinks.querySelector(`a[href="#${id}"]`);
+      }
+
+      function moveIndicatorTo(anchor) {
+        if (!anchor) {
+          indicator.style.opacity = '0';
+          return;
+        }
+        const navRect = nav.getBoundingClientRect();
+        const aRect = anchor.getBoundingClientRect();
+        indicator.style.left = (aRect.left - navRect.left) + 'px';
+        indicator.style.width = aRect.width + 'px';
+        indicator.style.opacity = '1';
+      }
+
+      let currentActive = null;
+
+      function updateActive() {
+        const scrollY = window.scrollY + nav.offsetHeight + 32;
+        let active = 'hero'; // default: hero / logo
+
+        for (let i = sections.length - 1; i >= 0; i--) {
+          const el = document.getElementById(sections[i]);
+          if (el && el.getBoundingClientRect().top + window.scrollY <= scrollY) {
+            active = sections[i];
+            break;
+          }
+        }
+
+        if (active === currentActive) return;
+        currentActive = active;
+
+        navLinks.querySelectorAll('a').forEach(a => a.classList.remove('nav-active'));
+        logoAnchor.classList.remove('nav-active');
+
+        const anchor = getAnchorForSection(active);
+        if (anchor) anchor.classList.add('nav-active');
+        moveIndicatorTo(anchor);
+      }
+
+      // Initial position without transition
+      indicator.style.transition = 'none';
+      updateActive();
+      requestAnimationFrame(() => {
+        indicator.style.transition = '';
+      });
+
+      window.addEventListener('scroll', updateActive, { passive: true });
+      window.addEventListener('resize', () => {
+        indicator.style.transition = 'none';
+        updateActive();
+        if (currentActive) moveIndicatorTo(getAnchorForSection(currentActive));
+        requestAnimationFrame(() => { indicator.style.transition = ''; });
       });
     })();
   </script>
