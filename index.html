@@ -1559,7 +1559,6 @@
         transform: translateY(20px);
         transition: opacity 0.5s ease, transform 0.5s ease;
       }
-
       .tech-item.mob-visible {
         opacity: 1;
         transform: translateY(0);
@@ -3191,19 +3190,9 @@
     }
 
     @keyframes rotate-hint {
-
-      0%,
-      100% {
-        transform: rotate(0deg);
-      }
-
-      40% {
-        transform: rotate(-90deg);
-      }
-
-      60% {
-        transform: rotate(-90deg);
-      }
+      0%, 100% { transform: rotate(0deg); }
+      40%       { transform: rotate(-90deg); }
+      60%       { transform: rotate(-90deg); }
     }
 
     #rotate-overlay .rotate-text {
