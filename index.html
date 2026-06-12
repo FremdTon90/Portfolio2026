@@ -1551,6 +1551,21 @@
       }
     }
 
+    /* Mobile portrait: no auto-animation — JS observer handles reveal + bars */
+    @media (max-width: 768px) and (orientation: portrait) {
+      .tech-item {
+        animation: none !important;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 0.5s ease, transform 0.5s ease;
+      }
+
+      .tech-item.mob-visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
     /* ── PROJECTS BG — Hex Grid Canvas ── */
     #projects {
       min-height: 200vh;
@@ -3161,8 +3176,8 @@
       display: none;
       position: fixed;
       inset: 0;
-      z-index: 99999;
-      background: var(--bg);
+      z-index: 999999;
+      background: #03070f;
       flex-direction: column;
       align-items: center;
       justify-content: center;
@@ -3172,8 +3187,8 @@
 
     #rotate-overlay .rotate-icon {
       font-size: 4rem;
-      animation: rotate-hint 2s ease-in-out infinite;
       display: block;
+      animation: rotate-hint 2s ease-in-out infinite;
     }
 
     @keyframes rotate-hint {
@@ -3190,23 +3205,26 @@
     }
 
     #rotate-overlay .rotate-text {
-      font-family: var(--font-mono);
-      font-size: 0.92rem;
-      color: var(--cyan);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.9rem;
+      color: #00e5ff;
       letter-spacing: 0.22em;
       text-align: center;
       text-transform: uppercase;
     }
 
     #rotate-overlay .rotate-sub {
-      font-family: var(--font-mono);
-      font-size: 0.7rem;
-      color: var(--text-dim);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.68rem;
+      color: #5a7a9a;
       letter-spacing: 0.12em;
       text-align: center;
+      max-width: 280px;
+      line-height: 1.6;
     }
 
-    @media (max-width: 900px) and (max-height: 900px) and (orientation: landscape) {
+    /* Show on any landscape mobile (width < height flipped) */
+    @media (orientation: landscape) and (max-height: 600px) {
       #rotate-overlay {
         display: flex;
       }
@@ -3364,8 +3382,7 @@
 
       .project-desc {
         font-size: 0.8rem;
-        -webkit-line-clamp: unset;
-        overflow: visible;
+        -webkit-line-clamp: 4;
       }
 
       .passions-grid {
@@ -4394,23 +4411,45 @@
 
     /* ── SCROLL REVEAL ── */
     const allTechItems = Array.from(document.querySelectorAll('.tech-item'));
+
+    const isMobPortrait = () =>
+      window.innerWidth <= 768 && window.matchMedia('(orientation: portrait)').matches;
+
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((e) => {
-        if (e.isIntersecting) {
-          // Use the actual DOM index for consistent stagger, not batch index
-          const domIndex = allTechItems.indexOf(e.target);
-          const delay = e.target.classList.contains('tech-item') ? domIndex * 80 : 0;
-          setTimeout(() => {
-            e.target.classList.add('visible');
-            if (e.target.classList.contains('tech-item')) {
+        if (!e.isIntersecting) return;
+
+        if (e.target.classList.contains('tech-item')) {
+          const idx = allTechItems.indexOf(e.target);
+          const stagger = idx * 100;
+
+          if (isMobPortrait()) {
+            // Mobile: animation suppressed via CSS, use transition + class
+            // Double rAF ensures the browser paints opacity:0 before we set width
+            setTimeout(() => {
+              e.target.classList.add('mob-visible');
+              const fill = e.target.querySelector('.tech-bar-fill');
+              if (fill) {
+                requestAnimationFrame(() => requestAnimationFrame(() => {
+                  fill.style.width = e.target.style.getPropertyValue('--pct');
+                }));
+              }
+            }, stagger);
+          } else {
+            // Desktop: original behaviour
+            setTimeout(() => {
+              e.target.classList.add('visible');
               const fill = e.target.querySelector('.tech-bar-fill');
               if (fill) fill.style.width = e.target.style.getPropertyValue('--pct');
-            }
-          }, delay);
-          observer.unobserve(e.target);
+            }, stagger);
+          }
+        } else {
+          e.target.classList.add('visible');
         }
+
+        observer.unobserve(e.target);
       });
-    }, { threshold: 0.05, rootMargin: '0px 0px -20px 0px' });
+    }, { threshold: 0.05, rootMargin: '0px 0px -10px 0px' });
 
     document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .tech-item').forEach(el => observer.observe(el));
 
@@ -5601,8 +5640,8 @@
   <!-- ROTATE OVERLAY -->
   <div id="rotate-overlay">
     <span class="rotate-icon">📱</span>
-    <div class="rotate-text">// Bitte drehen</div>
-    <div class="rotate-sub">Diese Seite ist für den Hochformat-Modus optimiert.</div>
+    <div class="rotate-text">// Handy hochkant halten</div>
+    <div class="rotate-sub">Diese Seite ist für den<br>Hochformat-Modus optimiert.</div>
   </div>
 
   <!-- RADAR PING ELEMENT -->
