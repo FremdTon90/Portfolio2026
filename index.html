@@ -1654,18 +1654,67 @@
       animation-duration: 2.4s;
     }
 
-    /* projects content hidden until click */
+    /* projects content hidden until scanline reveals it */
     #projects .section-wrapper {
-      opacity: 0;
-      transform: translateY(18px);
-      transition: opacity 0.8s ease, transform 0.8s ease;
+      clip-path: inset(0 0 100% 0);
       pointer-events: none;
+      will-change: clip-path;
     }
 
     #projects.unlocked .section-wrapper {
+      pointer-events: all;
+      clip-path: none;
+    }
+
+    /* no fly-in inside projects — scanner does the reveal */
+    #projects .reveal,
+    #projects .reveal-left,
+    #projects .reveal-right {
       opacity: 1;
       transform: none;
-      pointer-events: all;
+      transition: none;
+    }
+
+    /* ── SCANLINE OVERLAY ── */
+    #scan-overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 10;
+      overflow: visible;
+      display: none;
+    }
+
+    #scan-beam {
+      position: absolute;
+      left: -5%;
+      width: 110%;
+      height: 4px;
+      top: 0;
+      background: linear-gradient(90deg,
+          transparent 0%,
+          rgba(0, 229, 255, 0.15) 8%,
+          rgba(0, 229, 255, 0.9) 38%,
+          #00e5ff 50%,
+          rgba(0, 229, 255, 0.9) 62%,
+          rgba(0, 229, 255, 0.15) 92%,
+          transparent 100%);
+      box-shadow:
+        0 0 10px 3px rgba(0, 229, 255, 0.7),
+        0 0 35px 8px rgba(0, 229, 255, 0.3),
+        0 0 80px 16px rgba(0, 229, 255, 0.12);
+    }
+
+    #scan-beam::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 4px;
+      height: 80px;
+      background: linear-gradient(to bottom,
+          rgba(0, 229, 255, 0.07) 0%,
+          transparent 100%);
     }
 
     .projects-grid {
@@ -2571,33 +2620,745 @@
       transition: width 0.1s;
     }
 
-    /* ── MEDIA ── */
+    /* Force-show class set by JS on mobile */
+    .mob-portrait-visible {
+      position: static !important;
+      transform: none !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      opacity: 1 !important;
+      animation: none !important;
+      pointer-events: all !important;
+      margin-top: 1.5rem !important;
+      z-index: 2 !important;
+      display: flex !important;
+      flex-direction: column !important;
+    }
+
+    /* ══════════════════════════════════════════════════════
+       MOBILE — Portrait  (≤ 768 px)
+       Nur hier stehen mobile Overrides. Desktop bleibt
+       vollständig unberührt.
+    ══════════════════════════════════════════════════════ */
     @media (max-width: 768px) {
+
+      /* ── Cursor verstecken (kein Mauszeiger auf Touch) ── */
+      body {
+        cursor: auto;
+      }
+
+      .cursor-dot,
+      .cursor-ring {
+        display: none;
+      }
+
+      /* ── NAV ── */
       nav {
-        padding: 1rem 1.5rem;
+        padding: 0.85rem 1.2rem;
+        gap: 0;
       }
 
       .nav-links {
         display: none;
       }
 
-      section {
-        padding: 5rem 1.5rem;
+      .nav-status {
+        font-size: 0.62rem;
+        gap: 0.35rem;
       }
 
+      .nav-status .status-dot {
+        width: 7px;
+        height: 7px;
+      }
+
+      #nav-indicator {
+        display: none;
+      }
+
+      /* Hamburger-Button (wird per JS eingefügt) */
+      #mob-menu-btn {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 5px;
+        width: 32px;
+        height: 32px;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        flex-shrink: 0;
+        padding: 0;
+      }
+
+      #mob-menu-btn span {
+        display: block;
+        width: 100%;
+        height: 1.5px;
+        background: var(--cyan);
+        transition: transform 0.3s, opacity 0.3s;
+      }
+
+      #mob-menu-btn.open span:nth-child(1) {
+        transform: translateY(6.5px) rotate(45deg);
+      }
+
+      #mob-menu-btn.open span:nth-child(2) {
+        opacity: 0;
+      }
+
+      #mob-menu-btn.open span:nth-child(3) {
+        transform: translateY(-6.5px) rotate(-45deg);
+      }
+
+      /* Mobile Drawer */
+      #mob-drawer {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(3, 7, 15, 0.97);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+        z-index: 999;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2.2rem;
+        transform: translateX(100%);
+        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        border-left: 1px solid var(--border-bright);
+      }
+
+      #mob-drawer.open {
+        transform: translateX(0);
+      }
+
+      #mob-drawer a {
+        font-family: var(--font-display);
+        font-size: 1.35rem;
+        letter-spacing: 0.18em;
+        color: var(--text-dim);
+        text-decoration: none;
+        position: relative;
+        transition: color 0.2s;
+      }
+
+      #mob-drawer a::before {
+        content: '// ';
+        color: var(--cyan);
+        opacity: 0;
+        transition: opacity 0.2s;
+      }
+
+      #mob-drawer a:hover,
+      #mob-drawer a.nav-active {
+        color: var(--cyan);
+      }
+
+      #mob-drawer a:hover::before,
+      #mob-drawer a.nav-active::before {
+        opacity: 1;
+      }
+
+      /* ── HERO ── */
       #hero {
+        padding: 0 1.2rem;
+        padding-top: 70px;
+        min-height: 100svh;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: stretch;
+        padding-bottom: 4rem;
+        gap: 0;
+      }
+
+      /* Push portrait card BELOW hero-content via order */
+      .hero-portrait-wrap {
+        order: 2;
+      }
+
+      .hero-content {
+        order: 1;
+      }
+
+      .hero-scroll {
+        order: 3;
+      }
+
+      /* Character card: show below hero text on mobile, stacked layout */
+      .hero-portrait-wrap {
+        position: static !important;
+        transform: none !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        opacity: 1 !important;
+        animation: none !important;
+        pointer-events: all !important;
+        margin-top: 1.5rem;
+        z-index: 2;
+      }
+
+      .char-body {
+        grid-template-columns: 1fr;
+      }
+
+      .char-portrait-frame {
+        width: 100%;
+        height: 260px;
+        border-right: none;
+        border-top: 1px solid var(--border-bright);
+      }
+
+      .hero-portrait {
+        object-fit: cover !important;
+        object-position: 50% 15% !important;
+      }
+
+      .char-left {
+        border-right: none;
+        padding: 1rem;
+      }
+
+      .char-name {
+        font-size: 1.1rem;
+      }
+
+      .char-select-header {
+        font-size: 0.72rem;
+        padding: 0.5rem 0.8rem;
+      }
+
+      .char-footer {
+        flex-wrap: wrap;
+        padding: 0.5rem 0.8rem;
+        gap: 0.5rem;
+      }
+
+      .char-footer-text {
+        font-size: 0.58rem;
+      }
+
+      .char-play-btn {
+        font-size: 0.65rem;
+        padding: 0.3rem 0.7rem;
+        cursor: auto;
+      }
+
+      .hero-tag {
+        font-size: 0.68rem;
+        margin-bottom: 1rem;
+      }
+
+      .hero-name {
+        font-size: clamp(2rem, 11vw, 3.2rem);
+        letter-spacing: 0.02em;
+      }
+
+      .hero-subtitle {
+        font-size: 0.72rem;
+        letter-spacing: 0.12em;
+        margin-top: 0.6rem;
+        line-height: 1.6;
+      }
+
+      .hero-desc {
+        font-size: 0.92rem;
+        margin-top: 1.2rem;
+        max-width: 100%;
+      }
+
+      .hero-cta {
+        flex-direction: column;
+        gap: 0.75rem;
+        margin-top: 1.8rem;
+      }
+
+      .btn-primary,
+      .btn-secondary {
+        font-size: 0.75rem;
+        padding: 0.75rem 1.4rem;
+        text-align: center;
+        cursor: auto;
+      }
+
+      .hero-scroll {
+        display: none;
+      }
+
+      /* ── SECTIONS allgemein ── */
+      section {
+        padding: 4rem 1.2rem;
+      }
+
+      .section-title {
+        font-size: clamp(1.5rem, 7vw, 2.4rem);
+      }
+
+      .section-header {
+        margin-bottom: 2.5rem;
+      }
+
+      /* ── ABOUT ── */
+      .about-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+
+      .about-text {
+        padding: 1.4rem 1.2rem;
+      }
+
+      .identity-cards {
+        gap: 0.7rem;
+      }
+
+      .id-card {
+        padding: 1rem 1.1rem;
+        cursor: auto;
+      }
+
+      /* ── STACK ── */
+      #stack {
+        min-height: auto;
+      }
+
+      .stack-container {
+        padding: 0;
+      }
+
+      .tech-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+      }
+
+      .tech-item {
+        height: 160px;
+        padding: 1rem;
+        cursor: auto;
+      }
+
+      .tech-icon {
+        font-size: 1.8rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .tech-name {
+        font-size: 0.78rem;
+      }
+
+      .tech-level {
+        font-size: 0.66rem;
+      }
+
+      /* ── PROJECTS ── */
+      #projects {
+        min-height: auto;
+        padding: 4rem 0;
+      }
+
+      /* Projects: section-wrapper needs horizontal padding on mobile */
+      #projects .section-wrapper {
+        padding: 0 1.2rem;
+      }
+
+      /* Ampoule on mobile: smaller, positioned centrally */
+      #hex-hint {
+        display: flex;
+        pointer-events: all;
+      }
+
+      #ampoule-svg {
+        width: 80px !important;
+        height: auto !important;
+      }
+
+      .projects-grid {
+        gap: 2rem;
+        padding: 0 1rem;
+      }
+
+      .project-card {
+        width: 100%;
+        max-width: 100%;
+        height: auto;
+        grid-template-columns: 1fr;
+        margin-left: 0;
+        cursor: auto;
+      }
+
+      .project-media {
+        width: 100%;
+        height: 200px;
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      }
+
+      .project-meta {
+        padding: 1.2rem 1rem;
+        gap: 0.5rem;
+      }
+
+      .project-title {
+        font-size: 1.15rem;
+      }
+
+      .project-desc {
+        font-size: 0.85rem;
+        -webkit-line-clamp: 5;
+      }
+
+      /* ── PASSIONS ── */
+      #passions {
+        min-height: auto;
+      }
+
+      .passions-grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+      }
+
+      .passion-card {
+        cursor: auto;
+        padding: 1.1rem 1rem 1rem;
+      }
+
+      .passion-icon {
+        font-size: 1.4rem;
+      }
+
+      .passion-title {
+        font-size: 0.82rem;
+      }
+
+      .passion-desc {
+        font-size: 0.84rem;
+      }
+
+      /* ── DASHBOARD ── */
+      #dashboard {
+        padding: 4rem 1.2rem;
+      }
+
+      .dashboard-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.7rem;
+      }
+
+      .dash-card {
+        padding: 1rem;
+      }
+
+      .dash-label {
+        font-size: 0.58rem;
+      }
+
+      .dash-value {
+        font-size: 0.9rem;
+      }
+
+      .geo-city {
+        font-size: 1.3rem;
+      }
+
+      /* ── TIMELINE ── */
+      #story {
+        padding: 4rem 1.2rem !important;
+      }
+
+      .timeline {
+        padding-left: 1.5rem;
+      }
+
+      .timeline-item {
+        padding-left: 1.5rem;
+        margin-bottom: 2rem;
+      }
+
+      .timeline-dot {
+        left: -1.9rem;
+      }
+
+      .timeline-title {
+        font-size: 0.95rem;
+      }
+
+      .timeline-desc {
+        font-size: 0.88rem;
+      }
+
+      /* ── CONTACT ── */
+      #contact {
+        height: auto;
+        min-height: 80svh;
+        padding: 4rem 1.2rem;
+      }
+
+      .section-title[style] {
+        font-size: clamp(2rem, 9vw, 3rem) !important;
+      }
+
+      .contact-sub {
+        font-size: 0.78rem;
+        margin: 1rem auto 2rem;
+      }
+
+      .contact-links {
+        flex-direction: column;
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      .contact-link {
+        width: 100%;
+        max-width: 280px;
+        text-align: center;
+        font-size: 0.72rem;
+        padding: 0.75rem 1rem;
+        cursor: auto;
+      }
+
+      /* ── FOOTER ── */
+      footer {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+        text-align: center;
+        padding: 1.5rem 1.2rem;
+      }
+
+      footer span:first-child,
+      footer span:last-child {
+        justify-self: center;
+      }
+
+      /* ── DEPLOY OVERLAY ── */
+      .deploy-terminal {
+        font-size: 0.72rem;
+        padding: 1.5rem 1.2rem;
+      }
+
+      /* ── DIVIDER ── */
+      .divider {
+        margin: 0;
+      }
+
+      /* Links / Buttons: normaler Cursor auf Touch */
+      a,
+      button,
+      .nav-logo {
+        cursor: auto;
+      }
+    }
+
+    /* ══════════════════════════════════════════════════════
+       MOBILE — Landscape  (≤ 900 px Breite, max 500 px Höhe)
+       Kompaktere Höhen, side-by-side wo sinnvoll.
+    ══════════════════════════════════════════════════════ */
+    @media (max-width: 900px) and (max-height: 500px) and (orientation: landscape) {
+
+      body {
+        cursor: auto;
+      }
+
+      .cursor-dot,
+      .cursor-ring {
+        display: none;
+      }
+
+      nav {
+        padding: 0.6rem 1.2rem;
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      #nav-indicator {
+        display: none;
+      }
+
+      /* Hero in Landscape: side-by-side */
+      #hero {
+        min-height: 100svh;
         padding: 0 1.5rem;
+        padding-top: 56px;
+        flex-direction: row;
+        align-items: center;
+        gap: 2rem;
+      }
+
+      .hero-portrait-wrap {
+        display: none;
+      }
+
+      .hero-content {
+        max-width: 55vw;
+      }
+
+      .hero-tag {
+        font-size: 0.62rem;
+        margin-bottom: 0.6rem;
+      }
+
+      .hero-name {
+        font-size: clamp(1.5rem, 5vw, 2.5rem);
+      }
+
+      .hero-subtitle {
+        font-size: 0.65rem;
+        letter-spacing: 0.1em;
+        margin-top: 0.3rem;
+      }
+
+      .hero-desc {
+        font-size: 0.85rem;
+        margin-top: 0.7rem;
+      }
+
+      .hero-cta {
+        margin-top: 1rem;
+        flex-direction: row;
+        gap: 0.6rem;
+      }
+
+      .btn-primary,
+      .btn-secondary {
+        font-size: 0.68rem;
+        padding: 0.55rem 1rem;
+        cursor: auto;
+      }
+
+      .hero-scroll {
+        display: none;
+      }
+
+      section {
+        padding: 3rem 1.5rem;
+      }
+
+      .section-title {
+        font-size: clamp(1.3rem, 4vw, 2rem);
+      }
+
+      .section-header {
+        margin-bottom: 1.5rem;
       }
 
       .about-grid {
-        grid-template-columns: 1fr;
-        gap: 3rem;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        align-items: start;
+      }
+
+      .tech-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.6rem;
+      }
+
+      .tech-item {
+        height: 130px;
+        padding: 0.8rem;
+        cursor: auto;
+      }
+
+      .tech-icon {
+        font-size: 1.5rem;
+        margin-bottom: 0.3rem;
+      }
+
+      #projects {
+        min-height: auto;
+        padding: 3rem 0;
+      }
+
+      #hex-hint {
+        display: none;
+      }
+
+      .projects-grid {
+        gap: 1.5rem;
+        padding: 0 1rem;
+      }
+
+      .project-card {
+        width: 100%;
+        max-width: 100%;
+        height: auto;
+        grid-template-columns: 1fr 1fr;
+        margin-left: 0;
+        cursor: auto;
+      }
+
+      .project-media {
+        height: 100%;
+        min-height: 180px;
+        border-right: 1px solid rgba(255, 255, 255, 0.06);
+        border-bottom: none;
+      }
+
+      .project-meta {
+        padding: 1rem;
+      }
+
+      .project-desc {
+        font-size: 0.8rem;
+        -webkit-line-clamp: 4;
+      }
+
+      .passions-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.6rem;
+      }
+
+      .passion-card {
+        cursor: auto;
+      }
+
+      #dashboard {
+        padding: 3rem 1.5rem;
+      }
+
+      .dashboard-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+
+      #story {
+        padding: 3rem 1.5rem !important;
+      }
+
+      #contact {
+        height: auto;
+        min-height: auto;
+        padding: 3rem 1.5rem;
+      }
+
+      .contact-links {
+        flex-direction: row;
+        flex-wrap: wrap;
+      }
+
+      .contact-link {
+        cursor: auto;
       }
 
       footer {
-        flex-direction: column;
-        gap: 0.5rem;
+        grid-template-columns: 1fr;
         text-align: center;
+        padding: 1rem 1.5rem;
+        gap: 0.4rem;
+      }
+
+      footer span:first-child,
+      footer span:last-child {
+        justify-self: center;
+      }
+
+      a,
+      button,
+      .nav-logo {
+        cursor: auto;
       }
     }
   </style>
@@ -2626,9 +3387,25 @@
 
     <div class="nav-status">
       <div class="status-dot"></div>
-      VERFÜGBAR FÜR PROJEKTE
+      <span id="nav-status-text">VERFÜGBAR FÜR PROJEKTE</span>
     </div>
+
+    <!-- Hamburger — only visible on mobile -->
+    <button id="mob-menu-btn" aria-label="Menu" style="display:none;">
+      <span></span><span></span><span></span>
+    </button>
   </nav>
+
+  <!-- Mobile Drawer -->
+  <div id="mob-drawer">
+    <a href="#about">ABOUT</a>
+    <a href="#stack">STACK</a>
+    <a href="#projects">PROJEKTE</a>
+    <a href="#passions">UNIVERSEN</a>
+    <a href="#dashboard">TERMINAL</a>
+    <a href="#story">TIMELINE</a>
+    <a href="#contact">KONTAKT</a>
+  </div>
 
   <!-- HERO -->
   <section id="hero">
@@ -2860,6 +3637,9 @@
   <!-- PROJECTS -->
   <section id="projects">
     <canvas id="projectsCanvas"></canvas>
+    <div id="scan-overlay">
+      <div id="scan-beam"></div>
+    </div>
 
     <!-- HEX PULSE HINT LABEL -->
     <div id="hex-hint">
@@ -2945,9 +3725,9 @@
         <rect x="15" y="52" width="30" height="24" rx="2" fill="rgba(0,0,20,0.65)" stroke="rgba(0,229,255,0.45)"
           stroke-width="0.8" />
         <text x="30" y="61" text-anchor="middle" font-family="'Orbitron',monospace" font-size="5.8" font-weight="700"
-          fill="rgba(0,229,255,0.92)" letter-spacing="0.3" filter="url(#amp-glow)">CLICK</text>
+          fill="rgba(0,229,255,0.92)" letter-spacing="0.3" filter="url(#amp-glow)">KLICK</text>
         <text x="30" y="71" text-anchor="middle" font-family="'Orbitron',monospace" font-size="5.8" font-weight="700"
-          fill="rgba(0,229,255,0.92)" letter-spacing="0.3" filter="url(#amp-glow)">ME</text>
+          fill="rgba(0,229,255,0.92)" letter-spacing="0.3" filter="url(#amp-glow)">MICH</text>
       </svg>
 
     </div>
@@ -3601,30 +4381,54 @@
     setInterval(updateTime, 1000);
 
     async function loadGeoData() {
-      try {
-        const res = await fetch('https://ipapi.co/json/');
-        const d = await res.json();
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      const lang = navigator.language || 'N/A';
 
-        document.getElementById('geoCity').textContent = (d.city || 'UNBEKANNT').toUpperCase();
-        document.getElementById('geoRegion').textContent = `// ${d.region || ''}, ${d.country_name || ''}`;
-        document.getElementById('dashIP').textContent = d.ip || 'N/A';
-        document.getElementById('dashIP').classList.remove('loading');
-        document.getElementById('dashISP').textContent = d.org || 'N/A';
-        document.getElementById('dashISP').classList.remove('loading');
-        document.getElementById('dashCountry').textContent = `${d.country_name || 'N/A'} ${d.country_code ? '(' + d.country_code + ')' : ''}`;
-        document.getElementById('dashCountry').classList.remove('loading');
-        document.getElementById('dashTZ').textContent = d.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone;
-        document.getElementById('dashTZ').classList.remove('loading');
-      } catch (e) {
-        const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-        document.getElementById('geoCity').textContent = 'API NICHT ERREICHBAR';
-        document.getElementById('geoRegion').textContent = `// LOKAL ERKANNT: ${tz}`;
-        document.getElementById('dashIP').textContent = 'GEBLOCKT';
-        document.getElementById('dashISP').textContent = 'NICHT VERFÜGBAR';
-        document.getElementById('dashCountry').textContent = navigator.language.toUpperCase();
-        document.getElementById('dashTZ').textContent = tz;
-        ['dashIP', 'dashISP', 'dashCountry', 'dashTZ'].forEach(id => document.getElementById(id).classList.remove('loading'));
+      // Derive city/region hint from timezone (works offline + file://)
+      const tzParts = tz.split('/');
+      const tzCity = (tzParts[1] || tzParts[0] || '').replace(/_/g, ' ').toUpperCase();
+      const tzRegion = tzParts[0] || '';
+
+      // Try cloudflare trace — works from file:// and has no CORS issues
+      let ip = null, isp = null, country = null;
+      try {
+        const r = await fetch('https://cloudflare.com/cdn-cgi/trace');
+        if (r.ok) {
+          const txt = await r.text();
+          const get = k => (txt.match(new RegExp(k + '=(.+)')) || [])[1]?.trim();
+          ip = get('ip');
+          country = get('loc');
+        }
+      } catch (_) { }
+
+      // If Cloudflare worked, also try ip-api for full data
+      if (ip) {
+        try {
+          const r2 = await fetch(`https://ip-api.com/json/${ip}?fields=status,city,regionName,country,countryCode,isp,timezone`);
+          if (r2.ok) {
+            const d = await r2.json();
+            if (d.status === 'success') {
+              document.getElementById('geoCity').textContent = (d.city || tzCity).toUpperCase();
+              document.getElementById('geoRegion').textContent = `// ${d.regionName || ''}, ${d.country || ''}`;
+              document.getElementById('dashIP').textContent = ip;
+              document.getElementById('dashISP').textContent = d.isp || 'N/A';
+              document.getElementById('dashCountry').textContent = `${d.country || ''} (${d.countryCode || ''})`;
+              document.getElementById('dashTZ').textContent = d.timezone || tz;
+              ['dashIP', 'dashISP', 'dashCountry', 'dashTZ'].forEach(id => document.getElementById(id)?.classList.remove('loading'));
+              return;
+            }
+          }
+        } catch (_) { }
       }
+
+      // Pure local fallback — no network needed
+      document.getElementById('geoCity').textContent = tzCity || 'UNBEKANNT';
+      document.getElementById('geoRegion').textContent = `// ${tzRegion} · ${lang}`;
+      document.getElementById('dashIP').textContent = ip || 'LOKAL';
+      document.getElementById('dashISP').textContent = 'N/A';
+      document.getElementById('dashCountry').textContent = country || lang.split('-').pop() || 'N/A';
+      document.getElementById('dashTZ').textContent = tz;
+      ['dashIP', 'dashISP', 'dashCountry', 'dashTZ'].forEach(id => document.getElementById(id)?.classList.remove('loading'));
     }
 
     function detectDevTools() {
@@ -3873,21 +4677,87 @@
         }
       }, { threshold: 0.15 }).observe(section);
 
+      // Shared scan function used by both click and touch
+      function triggerScan() {
+        const sectionEl = document.getElementById('projects');
+        const wrapper = sectionEl.querySelector('.section-wrapper');
+        const overlay = document.getElementById('scan-overlay');
+        const beam = document.getElementById('scan-beam');
+        const sectionH = sectionEl.offsetHeight;
+        const DURATION = 8400;
+
+        overlay.style.display = 'block';
+        beam.style.top = '0px';
+
+        let startTime = null;
+        function animateScan(ts) {
+          if (!startTime) startTime = ts;
+          const elapsed = ts - startTime;
+          const progress = Math.min(elapsed / DURATION, 1);
+          const beamY = progress * sectionH;
+          beam.style.top = beamY + 'px';
+
+          sectionEl.querySelectorAll('.project-card').forEach(card => {
+            const cardTop = card.getBoundingClientRect().top - sectionEl.getBoundingClientRect().top;
+            if (beamY > cardTop) card.style.pointerEvents = 'all';
+          });
+
+          const wrapperRect = wrapper.getBoundingClientRect();
+          const beamAbsolute = sectionEl.getBoundingClientRect().top + beamY;
+          const revealedPx = Math.max(0, beamAbsolute - wrapperRect.top);
+          const wrapperH = wrapper.scrollHeight;
+          const bottomPct = revealedPx / wrapperH;
+          const revealedAbsPx = bottomPct * wrapperH;
+          wrapper.style.clipPath = `polygon(-500px 0, calc(100% + 500px) 0, calc(100% + 500px) ${revealedAbsPx}px, -500px ${revealedAbsPx}px)`;
+
+          if (progress < 1) {
+            requestAnimationFrame(animateScan);
+          } else {
+            overlay.style.display = 'none';
+            wrapper.style.clipPath = 'none';
+            sectionEl.classList.add('unlocked');
+            sectionEl.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach(el => {
+              el.style.transition = 'none';
+              el.classList.add('visible');
+            });
+          }
+        }
+        requestAnimationFrame(animateScan);
+      }
+
+      // Touch: trigger scan on tap anywhere in projects section
+      canvas.parentElement.addEventListener('touchstart', e => {
+        if (!hexHintDismissed) {
+          const r = canvas.parentElement.getBoundingClientRect();
+          const touch = e.touches[0];
+          const cx = touch.clientX - r.left;
+          const cy = touch.clientY - r.top;
+          hexHintDismissed = true;
+          entryPulses = [];
+          if (hint) hint.classList.add('hide');
+          clickPulses.push({ x: cx, y: cy, t: 0 });
+          setTimeout(triggerScan, 750);
+        }
+      }, { passive: true });
+
       canvas.parentElement.addEventListener('click', e => {
         const r = canvas.parentElement.getBoundingClientRect();
         const cx = e.clientX - r.left, cy = e.clientY - r.top;
-        clickPulses.push({ x: cx, y: cy, t: 0 });
 
         if (!hexHintDismissed) {
           hexHintDismissed = true;
           entryPulses = [];
           if (hint) hint.classList.add('hide');
-          setTimeout(() => {
-            section.classList.add('unlocked');
-            section.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach((el, i) => {
-              setTimeout(() => el.classList.add('visible'), i * 120);
-            });
-          }, 400);
+
+          // Step 1: outward hex pulse wave from click point
+          clickPulses.push({ x: cx, y: cy, t: 0 });
+
+          // Step 2: after 750ms, start the scanline
+          setTimeout(triggerScan, 750);
+
+        } else {
+          // post-unlock: decorative click pulse only
+          clickPulses.push({ x: cx, y: cy, t: 0 });
         }
       });
 
@@ -4896,6 +5766,88 @@
         if (currentActive) moveIndicatorTo(getAnchorForSection(currentActive));
         requestAnimationFrame(() => { indicator.style.transition = ''; });
       });
+    })();
+  </script>
+
+  <script>
+    /* ── MOBILE HAMBURGER MENU ── */
+    (function () {
+      const btn = document.getElementById('mob-menu-btn');
+      const drawer = document.getElementById('mob-drawer');
+      if (!btn || !drawer) return;
+
+      const isMobile = () => window.innerWidth <= 768 ||
+        (window.innerWidth <= 900 && window.innerHeight <= 500 && window.innerWidth > window.innerHeight);
+
+      function showHideBtn() {
+        btn.style.display = isMobile() ? 'flex' : 'none';
+        // Also hide nav-status text on very small screens
+        const statusText = document.getElementById('nav-status-text');
+        if (statusText) {
+          statusText.parentElement.style.display = isMobile() ? 'none' : 'flex';
+        }
+      }
+      function fixMobilePortrait() {
+        const wrap = document.querySelector('.hero-portrait-wrap');
+        if (!wrap) return;
+        if (isMobile()) {
+          wrap.classList.add('mob-portrait-visible');
+        } else {
+          wrap.classList.remove('mob-portrait-visible');
+          wrap.style.cssText = '';
+        }
+      }
+
+      showHideBtn();
+      fixMobilePortrait();
+      window.addEventListener('resize', () => { showHideBtn(); fixMobilePortrait(); });
+
+      btn.addEventListener('click', () => {
+        const open = drawer.classList.toggle('open');
+        btn.classList.toggle('open', open);
+        btn.setAttribute('aria-label', open ? 'Menü schließen' : 'Menü öffnen');
+        document.body.style.overflow = open ? 'hidden' : '';
+      });
+
+      // Close on link click
+      drawer.querySelectorAll('a').forEach(a => {
+        a.addEventListener('click', () => {
+          drawer.classList.remove('open');
+          btn.classList.remove('open');
+          btn.setAttribute('aria-label', 'Menü öffnen');
+          document.body.style.overflow = '';
+        });
+      });
+
+      // Close on backdrop tap (outside drawer links)
+      drawer.addEventListener('click', e => {
+        if (e.target === drawer) {
+          drawer.classList.remove('open');
+          btn.classList.remove('open');
+          document.body.style.overflow = '';
+        }
+      });
+
+      // Highlight active section in drawer too
+      const sections = ['about', 'stack', 'projects', 'passions', 'dashboard', 'story', 'contact'];
+      const drawerLinks = drawer.querySelectorAll('a');
+
+      function updateDrawerActive() {
+        const scrollY = window.scrollY + 80;
+        let active = '';
+        for (let i = sections.length - 1; i >= 0; i--) {
+          const el = document.getElementById(sections[i]);
+          if (el && el.getBoundingClientRect().top + window.scrollY <= scrollY) {
+            active = sections[i];
+            break;
+          }
+        }
+        drawerLinks.forEach(a => {
+          const href = a.getAttribute('href').replace('#', '');
+          a.classList.toggle('nav-active', href === active);
+        });
+      }
+      window.addEventListener('scroll', updateDrawerActive, { passive: true });
     })();
   </script>
 
