@@ -4507,7 +4507,7 @@
       // If Cloudflare worked, also try ip-api for full data
       if (ip) {
         try {
-          const r2 = await fetch(`https://ip-api.com/json/${ip}?fields=status,city,regionName,country,countryCode,isp,timezone`);
+          const r2 = await fetch(`https://ip-api.com/json/?fields=status,city,regionName,country,countryCode,isp,query,timezone`);
           if (r2.ok) {
             const d = await r2.json();
             if (d.status === 'success') {
